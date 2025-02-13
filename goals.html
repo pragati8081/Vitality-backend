@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basics Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .left, .right {
+            width: 50%;
+        }
+
+        .left img, .right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .right {
+            position: relative;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #333; /* Text color */
+        }
+
+        .content hr {
+            width: 50%;
+            border: none;
+            border-top: 2px solid #000;
+            margin: 10px auto;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            background-color: #7a5c3b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .button-container button:hover {
+            background-color: #6a4f33;
+        }
+    </style>
+</head>
+<body>
+    <div class="left">
+        <img src="{{ url_for('static', filename='images/Aveda_Wooden_Paddle_Brush.jpeg') }}" alt="Aveda Wooden Paddle Brush">
+    </div>
+    <div class="right">
+        <img src="" alt="Right side image">
+        <div class="content">
+            <h1>GOALS</h1>
+            <hr>
+            <br>
+            <br>
+            <br>
+
+            <div class="button-container">
+                <button onclick="nextPage()">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function nextPage() {
+            window.location.href = '/goalsQ1'; // Navigate to the Goals page
+        }
+    </script>
+</body>
+</html>

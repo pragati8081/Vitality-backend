@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8f2ea;
+            color: #333;
+            text-align: center;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px;
+            background-color: #9e8e7d;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .menu-icon {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #c89d94;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .circle-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .circle-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: 60px;
+            right: -20px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+            display: none;
+            white-space: nowrap;
+        }
+
+        .circle-icon:hover .tooltip {
+            display: block;
+        }
+
+    .carousel {
+         margin: 10px auto;
+        width: 100%;
+        max-width: none;
+        overflow: hidden;
+        border-radius: 0;
+        position: relative;
+     }
+
+    .carousel-inner {
+        display: flex;
+        transition: transform 1s ease-in-out;
+        width: 100%;
+    }
+
+    .carousel img {
+        width: 100%;
+        height: auto;
+        flex-shrink: 0;
+    }
+
+    .dots {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .dots .dot {
+        width: 10px;
+        height: 10px;
+        margin: 0 5px;
+        background-color: #ccc;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .dots .dot.active {
+        background-color: #c89d94;
+    }
+
+    .register-btn {
+        background-color: #7b2f2b;
+        color: #fff;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .register-btn:hover {
+         background-color: #5a2220;
+    }
+
+    .what-we-do {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffd5e6;
+        padding: 20px;
+        margin: 20px auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+    }
+
+    .what-we-do .content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        text-align: left;
+    }
+
+    .what-we-do .icon {
+          width: 300px;
+         height: 200px;
+         object-fit: contain;
+    }
+
+    .what-we-do .text h2 {
+        font-size: 24px;
+         color: #7b2f2b;
+         margin-bottom: 10px;
+    }
+
+    .what-we-do .text p {
+         font-size: 16px;
+         color: #333;
+         line-height: 1.6;
+    }
+
+    .why-choose-us .content {
+        display: flex;
+        justify-content: flex-start;  /* Align content to the left */
+        align-items: center;
+        background-color: #fba2dc;
+        padding: 20px;
+        margin: 20px auto;
+        border-radius: 10px;
+        max-width: 1200px;
+        width: 100%;
+        flex-direction: row-reverse; /* This will place the image on the right */
+        gap: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .why-choose-us .icon {
+            width: 300px;
+            height: 200px;
+            object-fit: contain;
+    }
+
+    .why-choose-us .content {
+            text-align: right;
+            max-width: 60%;
+    }
+
+    .why-choose-us .text h2 {
+            font-size: 24px;
+            color: #7b2f2b;
+            margin-bottom: 10px;
+    }
+
+    .why-choose-us .text p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+    }
+
+/*quiz section*/
+
+    .quiz-section {
+        position: relative; /* Set parent container to relative */
+        text-align: center;
+        margin-top: 20px;
+        padding: 40px 20px;
+        border-radius: 10px;
+        overflow: hidden; /* Ensure content doesn't overflow */
+    }
+
+    .quiz-section img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensure the image covers the section properly */
+    }
+
+
+    .register-btn {
+        background-color: #7b2f2b;
+        color: #fff;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+            border-radius: 20px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+   .content-overlay {
+        position: absolute; /* Positioning the content over the image */
+        top: 75%; /* Center vertically */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Fine-tune centering */
+        color: white; /* Change text color to make it visible on the image */
+    }
+
+    .register-btn:hover {
+        background-color: #5a2220;
+    }
+
+    .content-overlay p {
+        font-size: 14px;
+    }
+
+/*review cards*/
+    .cards {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 40px;
+        margin: 20px auto;
+        flex-wrap: wrap;
+        }
+
+    .card {
+        background-color: #ffeef2;
+        border-radius: 10px;
+        padding: 15px;
+        width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+/*profile icon*/
+
+    .circle-icon {
+        width: 50px;
+        height: 50px;
+        background-color: #b04d4d;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .circle-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-name {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .card-text {
+        background-color: #fce5e5;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: left;
+        color: #333;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="menu-icon">&#9776;</div>
+        <div>
+            <h1>VITALITY</h1>
+            <p>Your Personalized Path to Wellness</p>
+        </div>
+        <a href="/login">
+        <div class="circle-icon">
+            <img src="{{ url_for('static', filename='images/Premium_PSD___Profile_Icon_In_Minimalist_3D_Render-removebg-preview.png') }}" alt="Profile Icon">
+            <div class="tooltip">Click here to log in!</div>
+        </div>
+        </a>
+    </header>
+
+    <div class="carousel">
+        <div class="carousel-inner">
+            <img src="{{ url_for('static', filename='images/welcome_to_vitality.png') }}" alt="Carousel Image 1">
+            <img src="{{ url_for('static', filename='images/Untitled_design_1.png') }}" alt="Carousel Image 2">
+            <img src="{{ url_for('static', filename='images/Untitled_design_2.png') }}" alt="Carousel Image 3">
+        </div>
+    </div>
+
+    <div class="dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="what-we-do">
+        <div class="content">
+            <img src="" alt="What we do icon" class="icon">
+            <div class="text">
+                <h2>What we do?</h2>
+                <p>At Vitality, we are dedicated to empowering individuals to take charge of their physical and mental well-being through a holistic, personalized approach. Combining science-backed nutritional insights and compassionate mental health support, we stand as a trusted partner on your wellness journey.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="why-choose-us">
+        <div class="content">
+           <img src="{{ url_for('static', filename='images/download_4.jpeg') }}" alt="What we do icon" class="icon">
+            <div class="text">
+                <h2>Why Choose Us?</h2>
+                <p>At Vitality, we prioritize your health by providing tailored wellness plans, expert guidance, and ongoing support to help you achieve your fitness and mental well-being goals.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-section">
+        <img src="" alt="Quiz Image" class="quiz-image">
+        <div class="content-overlay">
+        <a href="{{ url_for('option') }}">
+             <button class="register-btn">Take Quiz</button>
+        </a>
+            <p>Your personalized journey starts here!</p>
+        </div>
+    </div>
+
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-header">
+                <div class="circle-icon">
+                    <img src="" alt="Image">
+                </div>
+                <div class="card-name">Name 1</div>
+            </div>
+            <div class="card-text">
+                <p>Text line 1</p>
+                <p>Text line 2</p>
+                <p>Text line 3</p>
+                <p>Text line 4</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="circle-icon">
+                    <img src="" alt="Image">
+                </div>
+                <div class="card-name">Name 2</div>
+            </div>
+            <div class="card-text">
+                <p>Text line 1</p>
+                <p>Text line 2</p>
+                <p>Text line 3</p>
+                <p>Text line 4</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="circle-icon">
+                    <img src="" alt="Image">
+                </div>
+                <div class="card-name">Name 3</div>
+            </div>
+            <div class="card-text">
+                <p>Text line 1</p>
+                <p>Text line 2</p>
+                <p>Text line 3</p>
+                <p>Text line 4</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="circle-icon">
+                    <img src="" alt="Image">
+                </div>
+                <div class="card-name">Name 4</div>
+            </div>
+            <div class="card-text">
+                <p>Text line 1</p>
+                <p>Text line 2</p>
+                <p>Text line 3</p>
+                <p>Text line 4</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="circle-icon">
+                    <img src="" alt="Image">
+                </div>
+                <div class="card-name">Name 5</div>
+            </div>
+            <div class="card-text">
+                <p>Text line 1</p>
+                <p>Text line 2</p>
+                <p>Text line 3</p>
+                <p>Text line 4</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const carouselInner = document.querySelector('.carousel-inner');
+        const slides = document.querySelectorAll('.carousel img');
+        const dots = document.querySelectorAll('.dot');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            carouselInner.style.transform = `translateX(-${index * slides[0].clientWidth}px)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        setInterval(nextSlide, 2000);
+
+        document.querySelector('.circle-icon').addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

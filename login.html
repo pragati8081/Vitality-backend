@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5e4d7, #f2d4c3);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            width: 800px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .image-section {
+            flex: 1;
+            background-color: #f5e6dd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .image-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #6d4c41;
+            text-align: center;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #3d3d3d;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .forgot-password {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .forgot-password a {
+            text-decoration: none;
+            font-size: 12px;
+            color: #b37b6d;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #8d614d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #704e3d;
+        }
+
+        .signup-link {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .signup-link a {
+            text-decoration: none;
+            color: #b37b6d;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Image Section -->
+        <div class="image-section">
+             <img src="{{ url_for('static', filename='images/loginpageimg.png') }}" alt="Login Image">
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h2>Log In</h2>
+             <form id="loginForm" method="POST">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <div class="signup-link">
+                Don’t have an account? <a href='/signup'>Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+     <script>
+           document.getElementById('loginForm').addEventListener('submit', async (event) => {
+        event.preventDefault();  // Prevent the form from submitting normally
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            // Send the login request to the backend
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+
+            if (response.status === 200) {
+                // If login is successful, redirect to the home page
+                window.location.href = '/';  // Redirects to the home page
+            } else {
+                // If login fails, show an error message
+                alert(result.message);
+            }
+        } catch (error) {
+            // Handle any network or unexpected errors
+            alert('An error occurred. Please try again later.');
+        }
+            });
+    </script>
+</body>
+</html>
