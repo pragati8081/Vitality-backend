@@ -186,6 +186,26 @@
     function selectOption(optionNumber) {
       console.log(`Option ${optionNumber} selected`);
       alert(`You selected Option ${optionNumber}`);
+        let response = {
+            question_id: "Q9",
+            selected_option: optionNumber,
+            quiz_category: "Physical Health",
+            level: "Basic"
+        };
+
+        console.log("Option Selected:", response);  // ✅ Debugging log
+
+        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response)
+        })
+        .then(response => {
+            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
+            return response.json();
+        })
+        .then(data => console.log("Response saved:", data))
+        .catch(error => console.error("Fetch Error:", error));
     }
 
     function goBack() {
