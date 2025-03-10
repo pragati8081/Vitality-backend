@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f8f1e7; }
+        .container { text-align: center; background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, button { margin: 10px 0; padding: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #8d614d; color: #fff; cursor: pointer; }
+        button:hover { background-color: #704e3d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Enter OTP sent to your {{ method }}</h2>
+    <form id="otpForm">
+        <input type="text" id="otp" placeholder="Enter OTP" required>
+        <input type="hidden" id="user_input" value="{{ user_input }}">
+        <button type="submit">Verify OTP</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('otpForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const otp = document.getElementById('otp').value;
+        const userInput = document.getElementById('user_input').value;
+
+        const response = await fetch('/verify_otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: userInput, otp: otp })
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        if (result.success) {
+            window.location.href = '/profilepage';
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitality.com</title>
+    <style>
+        @font-face {
+        font-family: "Playfair";
+        src: url(fonts/PlayfairDisplay-Regular.ttf);
+       } 
+        
+       @font-face {
+      font-family: "Raquel";
+      src: url(fonts/Raquel.ttf);
+    }
+    
+        body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 0;
+    overflow: auto; /* Change this line */
+    }
+    
+    .header {
+    background-color: #665448; /* Brown */
+    color: white;
+    padding: 5px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.logo-title {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); /* Center the logo and title */
+}
+
+.logo {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    margin-right: 10px;
+}
+
+h1 {
+    font-family: 'Raquel';
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.header button {
+    background-color: white;
+    color: #8B4513;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.header button:hover {
+    background-color: #f3d6d0;
+}
+
+/* Positioning buttons */
+.left-button {
+    position: absolute;
+    left: 15px;
+}
+
+.right-button {
+    position: absolute;
+    right: 45px;
+}
+
+        
+    .book-session-container {
+        position: relative;
+        width: 90%;
+        height: 50vh; /* Reduced height */
+    }
+
+    .background-image {
+        width: 94%;
+        height: 50vh; /* Matches the container's height */
+        object-fit: cover; /* Ensures the image covers the container proportionally */
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .text-section {
+    position: absolute;
+    top: 50%; /* Position in the center vertically */
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center horizontally */
+    text-align: center;
+    color: rgb(0, 0, 0); /* Text will be white for contrast */
+    z-index: 1; /* Ensure text is above the image */
+    }
+
+    .text-section h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    }
+
+    .text-section p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    }
+
+    .text-section button {
+    background-color: #c84b61;
+    color: white;
+    font-size: 16px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    
+    }
+
+    .text-section button:hover {
+    background-color: #b33c52;
+    transform: scale(1.1); /* Expands button by 10% */
+    }
+
+        /*concerns*/
+
+        .container {
+            text-align: center;
+            padding: 40px 15px;
+            background: linear-gradient(to bottom, #f8f2ea, #f8f2ea);
+            margin-bottom: 20px; 
+            
+        }
+
+        .container h1 {
+            font-family: Playfair;
+            font-size: 2.5em;
+            color: #000;
+            margin-bottom: 40px;
+        }
+
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 60px;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .icon-item {
+    opacity: 0; /* Initially hidden */
+    transform: scale(0.5);
+    transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+    }
+
+    .icon-item.show {
+    opacity: 1;
+    transform: scale(1);
+    }
+   
+    .icon-item {
+            text-align: center;
+            border-radius: 50%;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .icon-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-item img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+        .icon-item p {
+            font-size: 1.2em;
+            color: #555;
+            margin: 0;
+        }
+
+        .icon-item:nth-child(1) {
+            background-color: #d7aefb; /* light purple */
+        }
+
+        .icon-item:nth-child(2) {
+            background-color: #e6c9f7; /* lavender */
+        }
+
+        .icon-item:nth-child(3) {
+            background-color: #aecbfa; /* light blue */
+        }
+
+        .icon-item:nth-child(4) {
+            background-color: #a7d8c9; /* light seagreen */
+        }
+
+        .icon-item:nth-child(5) {
+            background-color: #beecbe; /* light green  */
+        }
+
+        .icon-item:nth-child(6) {
+            background-color: #fff475; /* light yellow */
+        }
+
+        .icon-item:nth-child(7) {
+            background-color: #ffc66a; /* light orange */
+        }
+
+        .icon-item:nth-child(8) {
+            background-color: #fdc0d3; /* light pink */
+        }
+
+        .icon-item:nth-child(9) {
+            background-color: #ffa8a8; /* light red */
+        }
+
+        .icon-item:nth-child(10) {
+            background-color: #fa8c8c; /* gray */
+        }
+
+        .icon-item {
+            width: 190px;
+            height: 190px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+        }
+
+        /*how it works section*/
+        .how-it-works {
+    text-align: center;
+    background: linear-gradient(to bottom, #dc9f9f, #f8f2ea);
+    padding:  20px;
+    width: 97.3%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.how-it-works h1 {
+    font-family: Playfair;
+    font-size: 2.75em;
+    color: #000;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.step {
+    
+    display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      opacity: 0; /* Initially hidden */
+    transform: translateX(-30px); /* Start position (left) */
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+    .step img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #fffcfc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .step-content {
+      margin-left: 20px;
+      text-align: left;
+    }
+
+    .step-content h2 {
+        font-family: Playfair;
+      font-size: 1.75em;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .step-content p {
+      font-size: 1.25em;
+      color: #555;
+      margin: 0;
+    }
+
+    .step:nth-child(odd) {
+      flex-direction: row-reverse;
+      text-align: right;
+    }
+
+    .step:nth-child(odd) .step-content {
+      margin-left: 0px ;
+      margin-right: 30px;
+    }
+
+    .faq-container {
+        width: 80%;
+        margin: 50px auto;
+        text-align: left;
+        background: #fce4e4;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: -0px;
+    }
+
+    .faq-title {
+        font-family: Playfair;
+        font-size: 2em;
+        text-align: center;
+        color: #8B4513;
+        margin-bottom: 30px;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid #fac7e6;
+        padding: 15px 0;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .faq-question {
+        font-family: Playfair;
+        font-size: 1.2em;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #333;
+    }
+
+    .faq-toggle {
+        font-size: 1.5em;
+        color: #8B4513;
+        transition: transform 0.3s ease;
+    }
+
+    .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px; /* Large enough value to fit content */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+    .faq-item.active .faq-toggle {
+        transform: rotate(180deg);
+    }
+
+    .get-started {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .get-started button {
+        background-color: #c84b61;
+        color: white;
+        font-size: 16px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s ease-in-out;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .get-started button:hover {
+        background-color: #b33c52;
+        transform: scale(1.1); /* Expands button by 10% */
+    }
+    
+    </style>
+</head>
+
+
+<body>
+    <div class="header">
+        <button class="left-button" onclick="goToHome()">Go Back to Home</button>
+        <div class="logo-title">
+            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+            <h1>Vitality</h1>
+        </div>
+        <button class="right-button" onclick="goToMentalHealth()">Take the Mental Health Quiz</button>
+    </div>
+    </div>
+    
+    <div class="hero-section">
+        <div class="text-section">
+            <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+            <button onclick="takeQuiz()">TAKE QUIZ</button>
+        </div>
+        
+      </div>
+      <div class="image-section">
+          <img src="{{ url_for('static', filename='images/ph.png') }}" alt="Physical Background">
+      </div>
+  </div>
+  
+
+    <div class="container">
+        <h1><u> For all your physical health concerns</u></h1>
+        <div class="icons-grid">
+            <!-- Row 1 -->
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Immunity_Boost-removebg-preview.png') }}" alt="ADHD">
+                <p>Immunity Boost</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Premium_Vector___Woman_character_isolated_on_white-removebg-preview.png') }}" alt="Trauma or Loss">
+                <p>Better Digestion</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Healthy_Skin___Hair-removebg-preview.png') }}" alt="Mood Disorders">
+                <p>Healthy Skin & Hair</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Joint___Bone_Health-removebg-preview.png') }}" alt="Motivation">
+                <p>Joint & Bone Health</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Energy___Stamina-removebg-preview.png') }}" alt="Eating Disorder">
+                <p>Energy & Stamina</p>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Sleep_Support-removebg-preview.png') }}" alt="Relationships">
+                <p>Sleep Support</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Heart___Blood_Health-removebg-preview.png') }}" alt="Anxiety">
+                <p>Heart & Blood Health</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Weight_Management-removebg-preview.png') }}" alt="Body Image and Self Worth">
+                <p>Weight Management</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/overall_health-removebg-preview.png') }}" alt="Anger">
+                <p>Overall Wellness</p>
+            </div>
+            <div class="icon-item">
+                <img src="{{ url_for('static', filename='images/Stress___Recovery-removebg-preview.png') }}" alt="Depression">
+                <p>Stress & Recovery</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="how-it-works">
+        <h1><u>How it works</u></h1>
+        <div class="step">
+            <img src="{{ url_for('static', filename='images/quiz-removebg-preview.png') }}" alt="Step 1" />
+          <div class="step-content">
+            <h2>Take the Quiz</h2>
+            <p>Answer a few questions about your Basic health, lifestyle, and health goals.</p>
+          </div>
+        </div>
+        <div class="step">
+            <img src="{{ url_for('static', filename='images/pills-removebg-preview.png') }}" alt="Step 2" />
+          <div class="step-content">
+            <h2>Get Your Personalized 4-Pill Plan</h2>
+            <p>Our AI-powered system selects the right mix of vitamins and supplements tailored to you.    </p>
+          </div>
+        </div>
+        <div class="step">
+            <img src="{{ url_for('static', filename='images/People_in_delivery_service_with_motorcycle_package_concept_vector_illustration-removebg-preview.png') }}" alt="Step 3" />
+          <div class="step-content">
+            <h2>Receive Your Box and Enjoy a Healthier You! </h2>
+            <p>Your 30-day supply arrives in easy-to-use daily sachets, ready for you to take anytime. Stick to your plan and feel the benefits of optimized nutrition.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-container">
+        <h1 class="faq-title">Frequently Asked Questions</h1>
+        <div class="faq-item">
+          <div class="faq-question">
+            What is included in my daily sachet?
+            <span class="faq-toggle">▼</span>
+          </div>
+          <div class="faq-answer">Each sachet contains 4 personalized pills based on your quiz results.
+                      </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            When should I take my supplements?
+            <span class="faq-toggle">▼</span>
+          </div>
+          <div class="faq-answer">You can take one sachet anytime during the day—morning, noon, or night.
+            </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            Can I change my recommendations later?
+            <span class="faq-toggle">▼</span>
+          </div>
+          <div class="faq-answer">Yes! You can retake the quiz anytime to adjust your recommendations.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            Are these supplements safe?
+            <span class="faq-toggle">▼</span>
+          </div>
+          <div class="faq-answer">All our products are doctor-formulated, scientifically backed, and tested for safety.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            How long before I see results?
+            <span class="faq-toggle">▼</span>
+          </div>
+          <div class="faq-answer">Most users notice improvements within 2-4 weeks, but consistency is key.
+          </div>
+        </div>
+        <div class="get-started">
+          <button onclick="redirectToQuiz()">Get Started</button>
+        </div>
+      </div>
+
+      <script>
+        function goToHome() {
+            window.location.href = '/'; // Redirects to vitality-home.html
+        }
+    
+        function goToMentalHealth() {
+            window.location.href = '/mentalhome'; // Redirects to basic.html
+        }
+    
+    function takeQuiz() {
+        window.location.href = '/basic'; // Change this to the correct quiz page
+    }
+
+    document.querySelectorAll('.faq-item').forEach(item => {
+    const answer = item.querySelector('.faq-answer');
+    
+    item.addEventListener('click', () => {
+        if (item.classList.contains('active')) {
+            item.classList.remove('active');
+            answer.style.maxHeight = "0px"; // Collapse
+        } else {
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + "px"; // Expand dynamically
+        }
+    });
+});
+
+    function redirectToQuiz() {
+        window.location.href = '/basic';
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+    const iconItems = document.querySelectorAll(".icon-item");
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                let randomDelay = Math.random() * 0.6; // Random delay between 0 to 0.6s
+                entry.target.style.transitionDelay = `${randomDelay}s`;
+                entry.target.classList.add("show");
+            } else {
+                entry.target.classList.remove("show"); // Reset when out of view
+            }
+        });
+    }, { threshold: 0.3 });
+
+    iconItems.forEach(icon => observer.observe(icon));
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const steps = document.querySelectorAll(".step");
+
+    function revealSteps() {
+        const triggerPoint = window.innerHeight * 0.75; // Adjust trigger point
+
+        steps.forEach((step, index) => {
+            const stepTop = step.getBoundingClientRect().top;
+
+            if (stepTop < triggerPoint) {
+                setTimeout(() => {
+                    step.style.opacity = "1";
+                    step.style.transform = "translateY(0)";
+                }, index * 300); // Delay each step by 300ms
+            } else {
+                // Reset when scrolling back up
+                step.style.opacity = "0";
+                step.style.transform = "translateY(-30px)";
+            }
+        });
+    }
+
+    window.addEventListener("scroll", revealSteps);
+    revealSteps(); // Run once in case steps are already in view
+});
+    </script>
+    
+</body>
+</html>

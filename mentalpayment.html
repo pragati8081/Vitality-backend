@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        @font-face {
+      font-family: "Raquel";
+      src: url(fonts/Raquel.ttf);
+    }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+    background: linear-gradient(to bottom, #fdfbfb, #f7f0eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft gradient background effect */
+.gradient-bg {
+    width: 400px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(217, 145, 255, 0.5), rgba(255, 119, 169, 0.4), rgba(107, 198, 255, 0.3));
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+}
+
+        
+ /* Header */
+ .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #A91E43;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px; 
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .home-button {
+      position: absolute;
+      left: 15px;
+      background-color: #d0a485;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s ease;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-button:hover {
+      background-color: #b08973;
+      transform: translateY(-2px);
+    }
+
+    .logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+
+    h1 {
+        font-family: 'Raquel';
+      font-size: 22px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            margin: 30px auto;
+            max-width: 900px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-details {
+            width: 50%;
+            padding-right: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .plan-details h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .plan-details ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .note {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .payment-form {
+            width: 45%;
+        }
+
+        .payment-form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .payment-form input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .discount-code {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .discount-code button {
+            background: #ae0258;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #pay-btn {
+            background: #ae0258;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #pay-btn:hover {
+            background: #cc5500;
+        }
+
+        .secure {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .plan-details, .payment-form {
+                width: 100%;
+                border-right: none;
+                padding-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <!-- Header -->
+  <header class="header">
+    <button class="home-button" onclick="goToHome()">Home</button>
+    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+    <h1>Vitality</h1>
+  </header>
+
+    <div class="container">
+        <div class="plan-details">
+            <h2>Therapy session: 60 minutes each</h2>
+            <p>You are not alone, we're here to help ❤️</p>
+            <br>
+            <h3>This plan has:</h3>
+            <ul>
+                <li>A 60-minute session with a psychologist</li>
+                <li>Ongoing guidance and support with our care team</li>
+            </ul>
+            <p class="note">PS: After selecting your date, time for the session and completing the payment, you can select the psychologist you already have and book a session with them again.</p>
+
+            <br>
+            <br>
+            <h3>Contact Us:</h3>
+            <br>
+            <p>📞 +91 8971768946</p>
+            <p>📧 care@rockethealth.app</p>
+<br>
+<br>
+            <h3>Terms & Conditions:</h3>
+            <p>✔️ This pack is valid for 6 months</p>
+        </div>
+
+        <div class="payment-form">
+            <h2>Payment Details</h2>
+            <label>Amount</label>
+            <input type="text" id="amount" value="₹899.00" readonly>
+
+            <label>Full Name</label>
+            <input type="text" value="Shallika Seth" readonly>
+
+            <label>Email*</label>
+            <input type="email" value="shallika.seth2316@gmail.com" readonly>
+
+            <label>Phone *</label>
+            <div class="phone-input">
+                <select>
+                    <option value="+91">🇮🇳 +91</option>
+                </select>
+                <input type="text" placeholder="Enter phone number">
+            </div>
+
+            <label>Referral / Discount Code</label>
+            <div class="discount-code">
+                <input type="text" id="discount" placeholder="Enter code">
+                <button onclick="applyDiscount()">Apply</button>
+            </div>
+
+            <button id="pay-btn">Pay ₹899.00</button>
+            <p class="secure">🔒 Payments are secure and encrypted</p>
+        </div>
+    </div>
+
+    <script>
+        function applyDiscount() {
+            let discountInput = document.getElementById("discount").value;
+            let payButton = document.getElementById("pay-btn");
+            let amount = document.getElementById("amount");
+
+            if (discountInput === "SAVE10") {
+                amount.value = "₹7,559.00"; // 10% off
+                payButton.innerText = "Pay ₹7,559.00";
+                alert("Discount applied! 10% off.");
+            } else {
+                alert("Invalid discount code.");
+            }
+        }
+
+        function goToHome() {
+    window.location.href = '/mentalhome'; // Change this to the actual homepage URL
+}
+
+    </script>
+</body>
+</html>
