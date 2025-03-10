@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitality - Therapy Booking</title>
+    <style>
+        @font-face {
+            font-family: "Raquel";
+            src: url(fonts/Raquel.ttf);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+    background: linear-gradient(to bottom, #fdfbfb, #f7f0eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft gradient background effect */
+.gradient-bg {
+    width: 400px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(217, 145, 255, 0.5), rgba(255, 119, 169, 0.4), rgba(107, 198, 255, 0.3));
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+}
+
+        
+ /* Header */
+ .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #A91E43;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px; 
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .home-button {
+      position: absolute;
+      left: 15px;
+      background-color: #d0a485;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s ease;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-button:hover {
+      background-color: #b08973;
+      transform: translateY(-2px);
+    }
+
+    .logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+
+    h1 {
+        font-family: 'Raquel';
+      font-size: 22px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+
+        /* Main Form Container */
+        .form-container {
+            display: flex;
+            width: 900px;
+            max-width: 90%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Left Section - Session Info */
+        .session-details {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .session-details img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff7043;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .session-details h2 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .session-details p {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .session-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .session-info span {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Right Section - Form */
+        .form-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .phone-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .phone-input .flag {
+            padding: 8px;
+            background: #eee;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .phone-input input {
+            flex: 1;
+            border-radius: 0 5px 5px 0;
+        }
+
+        /* Schedule Button */
+        .schedule-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #A91E43;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .schedule-btn:hover {
+            background: #870c30;
+        }
+
+        /* Confirmation Popup Styling */
+.popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.check-icon {
+    font-size: 40px;
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <!-- Header -->
+  <header class="header">
+    <button class="home-button" onclick="goToHome()">Home</button>
+    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+    <h1>Vitality</h1>
+  </header>
+
+    <!-- Main Container -->
+    <div class="form-container">
+        <!-- Back Button -->
+        <button class="back-btn" onclick="goBack()">&#8592;</button>
+
+        <!-- Left Section: Session Info -->
+        <div class="session-details">
+            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Rocket Health">
+            <h2>1:1 Therapy Session (60 minutes)</h2>
+            <p>Personalized therapy session with a matched therapist.</p>
+            <div class="session-info">
+                <span>⏳ Duration: <strong>60 min</strong></span>
+                <span>📅 Date: <strong id="session-date"></strong></span>
+                <span>⏰ Time: <strong id="session-time"></strong></span>
+            </div>
+        </div>
+
+        <!-- Right Section: Form -->
+        <div class="form-section">
+            <h3>Enter Details</h3>
+            <form id="bookingForm">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" required>
+
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" required>
+
+                <label for="email">Email *</label>
+                <input type="email" id="email" required>
+
+                <label for="whatsapp">WhatsApp Number *</label>
+                <div class="phone-input">
+                    <span class="flag">🇮🇳</span>
+                    <input type="tel" id="whatsapp" required>
+                </div>
+
+                <button type="submit" class="schedule-btn">Schedule Event</button>
+            </form>
+        </div>
+
+        <!-- Confirmation Popup -->
+<div id="confirmationPopup" class="popup-container">
+    <div class="popup-content">
+        <div class="check-icon">✔</div>
+        <h2>Confirmed</h2>
+        <br>
+        <br>
+        <p>You are scheduled with Shabrina Ashraf.</p>
+        <br>
+        <br>
+        <p>Redirecting...</p>
+    </div>
+</div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        let storedDate = localStorage.getItem("selectedDate");
+        let storedTime = localStorage.getItem("selectedTime");
+
+        if (storedDate && storedTime) {
+            document.getElementById("session-date").textContent = storedDate;
+            document.getElementById("session-time").textContent = storedTime;
+        }
+    });
+
+    document.getElementById("bookingForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent actual form submission
+
+    // Show confirmation popup
+    document.getElementById("confirmationPopup").style.display = "flex";
+
+    // Redirect after 3 seconds
+    setTimeout(function() {
+        window.location.href = '/mentalpayment'; 
+    }, 3000);
+});
+
+function goBack() {
+    window.history.back();
+}
+
+function goToHome() {
+    window.location.href = '/mentalhome'; // Change this to the actual homepage URL
+}
+
+    </script>
+
+</body>
+</html>

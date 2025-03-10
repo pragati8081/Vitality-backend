@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitality - Book Therapy Session</title>
+    <style>
+        @font-face {
+            font-family: "Raquel";
+            src: url(fonts/Raquel.ttf);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+    background: linear-gradient(to bottom, #fdfbfb, #f7f0eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Soft gradient background effect */
+.gradient-bg {
+    width: 400px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(217, 145, 255, 0.5), rgba(255, 119, 169, 0.4), rgba(107, 198, 255, 0.3));
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+}
+
+        /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #A91E43;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px; 
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .home-button {
+      position: absolute;
+      left: 15px;
+      background-color: #d0a485;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s ease;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-button:hover {
+      background-color: #b08973;
+      transform: translateY(-2px);
+    }
+
+    .logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+
+    h1 {
+        font-family: 'Raquel';
+      font-size: 22px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+
+        .booking-container {
+            display: flex;
+            width: 1000px;
+            max-width: 95%;
+            margin-top: 80px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            justify-content: space-between;
+        }
+         /* Left Section */
+         .session-info {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .session-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ff7043;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .session-info h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .session-info p {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .session-info .duration {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .session-info .duration img {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .calendar-container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .calendar-header button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        .calendar div {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .calendar div.disabled {
+            background: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .calendar div.selected {
+            background: #A91E43;
+            color: white;
+        }
+        .calendar div:hover:not(.disabled) {
+            background: #d0e4ff;
+        }
+        .timezone {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Time Slot Styling */
+        .time-slot-container {
+            flex: 1;
+            padding: 20px;
+            display: none;
+            position: relative;
+        }
+        .time-slot-container h4 {
+            margin-bottom: 10px;
+        }
+        .time-slot-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 60px; /* Ensures space for submit button */
+        }
+        .time-slot {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #01050a;
+            border-radius: 5px;
+            color: #A91E43;
+            cursor: pointer;
+            text-align: center;
+            width: 100px;
+        }
+        .time-slot:hover {
+            background: #A91E43;
+            color: white;
+        }
+        .selected-slot {
+            background: #A91E43;
+            color: white;
+        }
+
+        /* Submit Button */
+        .submit-button {
+            display: none;
+            position: absolute;
+            bottom: 20px; /* Increased space */
+            right: 20px;
+            padding: 12px 20px;
+            background: #A91E43;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+        
+        .submit-button:hover {
+            background: #870c30;
+            transform: scale(1.1); /* Increases button size on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <!-- Header -->
+  <header class="header">
+    <button class="home-button" onclick="goToHome()">Home</button>
+    <img src="images/vitality_logo.jpeg" alt="Vitality Logo" class="logo">
+    <h1>Vitality</h1>
+  </header>
+
+
+    <!-- Booking Section -->
+    <div class="booking-container">
+        <!-- Left Side: Session Info -->
+        <div class="session-info">
+            <img src="images/vitality_logo.jpeg" alt="Vitality Health">
+            <h3>1:1 Therapy Session (60 minutes)</h3>
+            <p>Our software matches you to the most compatible psychologist according to your needs.</p>
+            <div class="duration">
+                <img src="clock.png" alt="Clock">⏳ 60 min
+            </div>
+        </div>
+
+        <!-- Middle: Calendar -->
+        <div class="calendar-container">
+            <h4>Select a Date & Time</h4>
+            <div class="calendar-header">
+                <button onclick="changeMonth(-1)">&#10094;</button>
+                <span id="currentMonth"></span>
+                <button onclick="changeMonth(1)">&#10095;</button>
+            </div>
+            <div class="calendar" id="calendar"></div>
+            <p class="timezone">🕒 India Standard Time (IST)</p>
+        </div>
+
+        <!-- Right: Time Slots -->
+        <div class="time-slot-container" id="timeSlotContainer">
+            <h4>Available Slots</h4>
+            <div class="time-slot-grid" id="slotContainer"></div>
+            <button class="submit-button" id="submitButton">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let selectedDate = null;
+
+        function updateCalendar() {
+            const calendar = document.getElementById("calendar");
+            calendar.innerHTML = "";
+            const currentMonth = document.getElementById("currentMonth");
+
+            let year = currentDate.getFullYear();
+            let month = currentDate.getMonth();
+            let firstDay = new Date(year, month, 1).getDay();
+            let daysInMonth = new Date(year, month + 1, 0).getDate();
+            let today = new Date();
+
+            currentMonth.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+
+            for (let i = 0; i < firstDay; i++) {
+                calendar.appendChild(document.createElement("div"));
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement("div");
+                let currentLoopDate = new Date(year, month, day);
+                dayDiv.textContent = day;
+                
+                if (currentLoopDate < today.setHours(0,0,0,0)) {
+                    dayDiv.classList.add("disabled");
+                } else {
+                    dayDiv.onclick = function() {
+                        document.querySelectorAll(".calendar div").forEach(el => el.classList.remove("selected"));
+                        this.classList.add("selected");
+                        selectedDate = currentLoopDate;
+                        showTimeSlots();
+                    };
+                }
+                calendar.appendChild(dayDiv);
+            }
+        }
+
+        function showTimeSlots() {
+            let now = new Date();
+            let startHour = (selectedDate.toDateString() === now.toDateString()) ? now.getHours() + 1 : 10;
+            let slots = [];
+
+            for (let i = startHour; i <= 23; i++) {
+                let period = i >= 12 ? "PM" : "AM";
+                let hour = i > 12 ? i - 12 : i;
+                hour = hour === 0 ? 12 : hour;
+                slots.push(`<div class="time-slot" onclick="selectSlot(this)">${hour}:00 ${period}</div>`);
+            }
+
+            document.getElementById("timeSlotContainer").style.display = "block";
+            document.getElementById("slotContainer").innerHTML = slots.join("");
+        }
+
+        function selectSlot(element) {
+            document.querySelectorAll(".time-slot").forEach(slot => slot.classList.remove("selected-slot"));
+            element.classList.add("selected-slot");
+            document.getElementById("submitButton").style.display = "block";
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            updateCalendar();
+        }
+
+        updateCalendar();
+
+        document.getElementById("submitButton").addEventListener("click", function() {
+    // Example: Redirect to a confirmation page
+    window.location.href = '/details'; // Change this to your desired URL
+});
+
+function goToHome() {
+    window.location.href = '/mentalhome'; // Change this to the actual homepage URL
+}
+
+document.getElementById("bookingForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent actual form submission
+
+        // Assume you have inputs for date and time in the first page
+        let selectedDate = document.getElementById("dateInput").value; 
+        let selectedTime = document.getElementById("timeInput").value;
+
+        // Save values in localStorage
+        localStorage.setItem("selectedDate", selectedDate);
+        localStorage.setItem("selectedTime", selectedTime);
+
+        // Redirect to the second page
+        window.location.href = "details.html"; // Change to actual second page URL
+    });
+
+
+    </script>
+
+</body>
+</html>
