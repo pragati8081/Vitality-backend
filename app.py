@@ -1,14 +1,28 @@
 from flask import Flask, render_template, request,  jsonify,session, redirect,url_for
 from flask_pymongo import PyMongo
 import bcrypt
-from datetime import datetime 
+from datetime import datetime , timedelta
 from random import randint
+from bson import ObjectId
+from werkzeug.security import generate_password_hash
+from bson import ObjectId
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/vitality"
-mongo = PyMongo(app)
-quiz_responses = mongo.db.quiz_responses
+
+# ✅ Set Secret Key First
 app.config['SECRET_KEY'] = 'a1b2c3d4e5f6'
+
+# ✅ Configure MongoDB Connection
+app.config["MONGO_URI"] = "mongodb://localhost:27017/vitality"
+
+# ✅ Initialize PyMongo
+mongo = PyMongo(app)
+
+# ✅ Access Collections
+quiz_responses = mongo.db.quiz_responses
+users_collection = mongo.db.users  
+therapists_collection = mongo.db.therapists
+appointments_collection = mongo.db.appointments  # Collection to store therapist bookings
 
 otp_storage = {} 
 @app.route('/forgot_password')
@@ -19,37 +33,91 @@ def forgot_password():
 def booksession():
     return render_template('booksession.html')
 
+@app.route('/profilepage')
+def profilepage():
+    if 'user_id' not in session:  # Ensure user is logged in
+        return redirect(url_for('login_page'))
+    return render_template('profilepage.html')
+
+@app.route('/get_profile', methods=['GET'])
+def get_profile():
+    try:
+        if 'user_id' not in session:
+            return jsonify({"error": "User not logged in"}), 401
+
+        user = mongo.db.users.find_one(
+            {"_id": ObjectId(session['user_id'])},
+            {"_id": 0, "password": 0}
+        )
+
+        if user:
+            # If 'name' exists, return it; otherwise, combine first_name and last_name
+            user["name"] = user.get("name") or f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+            return jsonify(user)
+        else:
+            return jsonify({"error": "Profile not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    
+@app.route('/save_profile', methods=['POST'])
+def save_profile():
+    try:
+        if 'user_id' not in session:
+            return jsonify({"error": "User not logged in"}), 401
+
+        data = request.json
+
+        # Validate data
+        if not data.get("username") or not data.get("address") or not data.get("phone"):
+            return jsonify({"error": "All fields are required"}), 400
+
+        # Update the user record
+        mongo.db.users.update_one(
+            {"_id": ObjectId(session['user_id'])},
+            {"$set": {
+                "username": data["username"],
+                "address": data["address"],
+                "phone": data["phone"]
+            }}
+        )
+
+        return jsonify({"message": "Profile updated successfully!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/take_quiz', methods=['GET', 'POST'])
+def take_quiz():
+    if 'user_id' not in session:  # Redirect to login if not authenticated
+        return redirect(url_for('login_page'))
+    return redirect(url_for('option'))  # Redirect to quiz options
+
+@app.route('/check_login')
+def check_login():
+    return jsonify({'logged_in': 'user_id' in session})
 
 # Route to serve the reset password page based on the selected method
-@app.route('/reset_password/<method>')
-def reset_password(method):
-    if method in ['email', 'phone']:
-        return render_template('reset_password.html', method=method)
-    else:
-        return redirect('/forgot_password')
+@app.route("/reset_password/<method>")
+def reset_password_page(method):
+    if method not in ["email", "phone"]:
+        return "Invalid method", 400  # Ensure only email or phone is used
+    return render_template("reset_password.html", method=method)
 
 # Route to send OTP to email or phone
 @app.route('/send_otp')
 def send_otp():
     method = request.args.get('method')
     user_input = request.args.get('input')
-    user = None
-
-    # Find user by email or phone
-    if method == 'email':
-        user = mongo.db.users.find_one({'email': user_input})
-    elif method == 'phone':
-        user = mongo.db.users.find_one({'phone': user_input})
+    user = users_collection.find_one({'email': user_input} if method == 'email' else {'phone': user_input})
 
     if user:
         otp = str(randint(1000, 9999))
-        otp_storage[user_input] = otp
+        otp_storage[user_input] = {"otp": otp, "expires_at": datetime.utcnow() + timedelta(minutes=5)}
         print(f"OTP for {user_input}: {otp}")  # For testing; replace with actual email/SMS sending
-        return jsonify({'success': True, 'message': 'OTP sent successfully!'})
+        return jsonify({'success': True, 'message': f'OTP sent to {user_input}!'})
     else:
-        return jsonify({'success': False, 'message': 'User not found!'})
-
-# Route to verify OTP
+        return jsonify({'success': False, 'message': 'User not found. Please enter a registered email/phone!'})
+    
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
     if request.method == 'GET':
@@ -57,33 +125,64 @@ def verify_otp():
         user_input = request.args.get('input')
         return render_template('verify_otp.html', method=method, user_input=user_input)
 
-    # POST request to verify OTP
-    data = request.get_json()
-    user_input = data['input']
-    otp = data['otp']
+    # POST request for OTP verification
+    data = request.json
+    user_input = data.get('input')
+    otp = data.get('otp')
 
-    if otp_storage.get(user_input) == otp:
-        session['reset_user'] = user_input
-        return jsonify({'success': True, 'message': 'OTP verified!'})
-    else:
-        return jsonify({'success': False, 'message': 'Invalid OTP!'})
+    stored_otp_data = otp_storage.get(user_input)
+    if stored_otp_data:
+        if stored_otp_data["otp"] == otp:
+            session['reset_user'] = user_input
+            return jsonify({'success': True, 'message': 'OTP verified!'})
+    
+    return jsonify({'success': False, 'message': 'Invalid OTP!'})
+
 
 # Route to update password after OTP verification
-@app.route('/update_password', methods=['POST'])
+@app.route("/update_password", methods=["POST"])
 def update_password():
-    if 'reset_user' in session:
-        data = request.get_json()
-        new_password = data['new_password']
+    try:
+        if 'user_id' not in session:
+            return jsonify({"success": False, "message": "User not logged in"}), 401
+
+        data = request.json
+        current_password = data.get("current_password")
+        new_password = data.get("password")
+
+        if not new_password:
+            return jsonify({"success": False, "message": "New password is required"}), 400
+
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+
+        if not user:
+            return jsonify({"success": False, "message": "User not found"}), 404
+
+        if current_password:
+            if "password" not in user:
+                return jsonify({"success": False, "message": "Password not found"}), 400
+
+            if not bcrypt.checkpw(current_password.encode('utf-8'), user["password"]):
+                return jsonify({"success": False, "message": "Incorrect current password"}), 400
+
         hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-        
-        # Update password in the database
-        mongo.db.users.update_one(
-            {'$or': [{'email': session['reset_user']}, {'phone': session['reset_user']}]},
-            {'$set': {'password': hashed_password}}
+
+        users_collection.update_one(
+            {"_id": ObjectId(session['user_id'])},
+            {"$set": {"password": hashed_password}}
         )
-        session.pop('reset_user', None)  # Clear session
-        return jsonify({'success': True, 'message': 'Password updated successfully!'})
-    return jsonify({'success': False, 'message': 'Unauthorized access!'})
+
+        return jsonify({"success": True, "message": "Password updated successfully!"})
+
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/new_password")
+def new_password_page():
+    user_input = request.args.get("input")
+    return render_template("new_password.html", user_input=user_input)
+
 
 @app.route('/')
 def home():
@@ -92,22 +191,22 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if request.method == 'POST':
-        # Parse login form data
         data = request.get_json()
         email = data['email']
         password = data['password']
 
-        # Look up user in database
         user = mongo.db.users.find_one({'email': email})
+
         if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
-            session.clear()  
-            session['user_id'] = str(user['_id']) 
-            session['user'] = email  # Store user email in session
-            print("Login successful!")
+            session.clear()
+            session['user_id'] = str(user['_id'])
+            session['user'] = email
+            print("✅ Login successful!")
             return jsonify({'message': 'Login successful!'}), 200
-           
-        else: return jsonify({'message': 'User not registered'}), 401
-    return render_template('login.html')  # Serve login page for GET requests
+        else:
+            return jsonify({'message': 'Invalid email or password'}), 401  # 🔹 Better error message
+
+    return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup_page():
@@ -134,15 +233,6 @@ def signup_page():
         return jsonify({'message': 'User registered successfully!'}), 400
 
     return render_template('signup.html')  # Serve signup page for GET requests
-
-@app.route('/check_login')
-def check_login():
-    if 'user_id' in session:  # Assuming you use session to track logged-in users
-        print("Session Data:", session)  # 🔍 Debugging line
-        return {'logged_in': True}
-     
-    else:
-        return {'logged_in': False}
         
 @app.route('/options', methods=['GET', 'POST'])
 def option():
@@ -150,16 +240,6 @@ def option():
         return render_template('option.html')
     else:
         return redirect(url_for('login_page'))  # Redirect to log in if not logged in
-
-@app.route('/take_quiz', methods=['GET', 'POST'])
-def take_quiz():
-    if 'user' in session:
-        return redirect(url_for('option'))  # Redirect to option.html if logged in
-    return redirect(url_for('login_page'))  # Redirect to login page if not logged in
-
-@app.route('/profilepage')
-def profilepage():
-    return render_template('profilepage.html')
 
 @app.route('/physicalhome')
 def physicalhome():
@@ -209,86 +289,6 @@ def basic_q9():
 def basic_q10():
     return render_template('basicQ10.html')
 
-@app.route('/basicQ11')
-def basic_q11():
-    return render_template('basicQ11.html')
-
-@app.route('/basicQ12')
-def basic_q12():
-    return render_template('basicQ12.html')
-
-@app.route('/basicQ13')
-def basic_q13():
-    return render_template('basicQ13.html')
-
-@app.route('/basicQ14')
-def basic_q14():
-    return render_template('basicQ14.html')
-
-@app.route('/basicQ15')
-def basic_q15():
-    return render_template('basicQ15.html')
-
-@app.route('/basicQ16')
-def basic_q16():
-    return render_template('basicQ16.html')
-
-@app.route('/basicQ17')
-def basic_q17():
-    return render_template('basicQ17.html')
-
-@app.route('/basicQ18')
-def basic_q18():
-    return render_template('basicQ18.html')
-
-@app.route('/basicQ19')
-def basic_q19():
-    return render_template('basicQ19.html')
-
-@app.route('/basicQ20')
-def basic_q20():
-    return render_template('basicQ20.html')
-
-@app.route('/basicQ21')
-def basic_q21():
-    return render_template('basicQ21.html')
-
-@app.route('/basicQ22')
-def basic_q22():
-    return render_template('basicQ22.html')
-
-@app.route('/basicQ23')
-def basic_q23():
-    return render_template('basicQ23.html')
-
-@app.route('/basicQ24')
-def basic_q24():
-    return render_template('basicQ24.html')
-
-@app.route('/basicQ25')
-def basic_q25():
-    return render_template('basicQ25.html')
-
-@app.route('/basicQ26')
-def basic_q26():
-    return render_template('basicQ26.html')
-
-@app.route('/basicQ27')
-def basic_q27():
-    return render_template('basicQ27.html')
-
-@app.route('/basicQ28')
-def basic_q28():
-    return render_template('basicQ28.html')
-
-@app.route('/basicQ29')
-def basic_q29():
-    return render_template('basicQ29.html')
-
-@app.route('/basicQ30')
-def basic_q30():
-    return render_template('basicQ30.html')
-
 @app.route('/lifestyle')
 def lifestyles():
     return render_template('lifestyle.html')
@@ -332,86 +332,6 @@ def lifestyle_q9():
 @app.route('/lifestyleQ10')
 def lifestyle_q10():
     return render_template('lifestyleQ10.html')
-
-@app.route('/lifestyleQ11')
-def lifestyle_q11():
-    return render_template('lifestyleQ11.html')
-
-@app.route('/lifestyleQ12')
-def lifestyle_q12():
-    return render_template('lifestyleQ12.html')
-
-@app.route('/lifestyleQ13')
-def lifestyle_q13():
-    return render_template('lifestyleQ13.html')
-
-@app.route('/lifestyleQ14')
-def lifestyle_q14():
-    return render_template('lifestyleQ14.html')
-
-@app.route('/lifestyleQ15')
-def lifestyle_q15():
-    return render_template('lifestyleQ15.html')
-
-@app.route('/lifestyleQ16')
-def lifestyle_q16():
-    return render_template('lifestyleQ16.html')
-
-@app.route('/lifestyleQ17')
-def lifestyle_q17():
-    return render_template('lifestyleQ17.html')
-
-@app.route('/lifestyleQ18')
-def lifestyle_q18():
-    return render_template('lifestyleQ18.html')
-
-@app.route('/lifestyleQ19')
-def lifestyle_q19():
-    return render_template('lifestyleQ19.html')
-
-@app.route('/lifestyleQ20')
-def lifestyle_q20():
-    return render_template('lifestyleQ20.html')
-
-@app.route('/lifestyleQ21')
-def lifestyle_q21():
-    return render_template('lifestyleQ21.html')
-
-@app.route('/lifestyleQ22')
-def lifestyle_q22():
-    return render_template('lifestyleQ22.html')
-
-@app.route('/lifestyleQ23')
-def lifestyle_q23():
-    return render_template('lifestyleQ23.html')
-
-@app.route('/lifestyleQ24')
-def lifestyle_q24():
-    return render_template('lifestyleQ24.html')
-
-@app.route('/lifestyleQ25')
-def lifestyle_q25():
-    return render_template('lifestyleQ25.html')
-
-@app.route('/lifestyleQ26')
-def lifestyle_q26():
-    return render_template('lifestyleQ26.html')
-
-@app.route('/lifestyleQ27')
-def lifestyle_q27():
-    return render_template('lifestyleQ27.html')
-
-@app.route('/lifestyleQ28')
-def lifestyle_q28():
-    return render_template('lifestyleQ28.html')
-
-@app.route('/lifestyleQ29')
-def lifestyle_q29():
-    return render_template('lifestyleQ29.html')
-
-@app.route('/lifestyleQ30')
-def lifestyle_q30():
-    return render_template('lifestyleQ30.html')
 
 @app.route('/goals')
 def goals():
@@ -457,85 +377,6 @@ def goals_q9():
 def goals_q10():
     return render_template('goalsQ10.html')
 
-@app.route('/goalsQ11')
-def goals_q11():
-    return render_template('goalsQ11.html')
-
-@app.route('/goalsQ12')
-def goals_q12():
-    return render_template('goalsQ12.html')
-
-@app.route('/goalsQ13')
-def goals_q13():
-    return render_template('goalsQ13.html')
-
-@app.route('/goalsQ14')
-def goals_q14():
-    return render_template('goalsQ14.html')
-
-@app.route('/goalsQ15')
-def goals_q15():
-    return render_template('goalsQ15.html')
-
-@app.route('/goalsQ16')
-def goals_q16():
-    return render_template('goalsQ16.html')
-
-@app.route('/goalsQ17')
-def goals_q17():
-    return render_template('goalsQ17.html')
-
-@app.route('/goalsQ18')
-def goals_q18():
-    return render_template('goalsQ18.html')
-
-@app.route('/goalsQ19')
-def goals_q19():
-    return render_template('goalsQ19.html')
-
-@app.route('/goalsQ20')
-def goals_q20():
-    return render_template('goalsQ20.html')
-
-@app.route('/goalsQ21')
-def goals_q21():
-    return render_template('goalsQ21.html')
-
-@app.route('/goalsQ22')
-def goals_q22():
-    return render_template('goalsQ22.html')
-
-@app.route('/goalsQ23')
-def goals_q23():
-    return render_template('goalsQ23.html')
-
-@app.route('/goalsQ24')
-def goals_q24():
-    return render_template('goalsQ24.html')
-
-@app.route('/goalsQ25')
-def goals_q25():
-    return render_template('goalsQ25.html')
-
-@app.route('/goalsQ26')
-def goals_q26():
-    return render_template('goalsQ26.html')
-
-@app.route('/goalsQ27')
-def goals_q27():
-    return render_template('goalsQ27.html')
-
-@app.route('/goalsQ28')
-def goals_q28():
-    return render_template('goalsQ28.html')
-
-@app.route('/goalsQ29')
-def goals_q29():
-    return render_template('goalsQ29.html')
-
-@app.route('/goalsQ30')
-def goals_q30():
-    return render_template('goalsQ30.html')
 
 @app.route('/recommendation')
 def recommendation():
@@ -609,105 +450,38 @@ def mental15():
 def mental16():
     return render_template('mental16.html')
 
-@app.route('/mental17')
-def mental17():
-    return render_template('mental17.html')
-
-@app.route('/mental18')
-def mental18():
-    return render_template('mental18.html')
-
-@app.route('/mental19')
-def mental19():
-    return render_template('mental19.html')
-
-@app.route('/mental20')
-def mental20():
-    return render_template('mental20.html')
-
-@app.route('/mental21')
-def mental21():
-    return render_template('mental21.html')
-
-@app.route('/mental22')
-def mental22():
-    return render_template('mental22.html')
-
-@app.route('/mental23')
-def mental23():
-    return render_template('mental23.html')
-
-@app.route('/mental24')
-def mental24():
-    return render_template('mental24.html')
-
-@app.route('/mental25')
-def mental25():
-    return render_template('mental25.html')
-
-@app.route('/mental26')
-def mental26():
-    return render_template('mental26.html')
-
-@app.route('/mental27')
-def mental27():
-    return render_template('mental27.html')
-
-@app.route('/mental28')
-def mental28():
-    return render_template('mental28.html')
-
-@app.route('/mental29')
-def mental29():
-    return render_template('mental29.html')
-
-@app.route('/mental30')
-def mental30():
-    return render_template('mental30.html')
-
-@app.route('/mental31')
-def mental31():
-    return render_template('mental31.html')
-
-@app.route('/mental32')
-def mental32():
-    return render_template('mental32.html')
-
-@app.route('/mental33')
-def mental33():
-    return render_template('mental33.html')
-
-@app.route('/mental34')
-def mental34():
-    return render_template('mental34.html')
-
-@app.route('/mental35')
-def mental35():
-    return render_template('mental35.html')
-
-@app.route('/mental36')
-def mental36():
-    return render_template('mental36.html')
-
-@app.route('/mental37')
-def mental37():
-    return render_template('mental37.html')
-
-@app.route('/mental38')
-def mental38():
-    return render_template('mental38.html')
-
-@app.route('/mental39')
-def mental39():
-    return render_template('mental39.html')
-
-@app.route('/mental41')
-def mental41():
-    return render_template('mental41.html')
-
 @app.route('/submitpage')
 def submitpage():
     return render_template('submitpage.html')
+
+@app.route("/get_therapist_details", methods=["GET"])
+def get_therapist_details():
+    try:
+        if 'user_id' not in session:
+            return jsonify({"error": "User not logged in"}), 401
+
+        user_id = session['user_id']
+        appointment = mongo.db.appointments.find_one({"user_id": user_id})
+
+        if not appointment:
+            return jsonify({"error": "No therapy appointments found"}), 404
+
+        therapist = mongo.db.therapists.find_one({"_id": appointment["therapist_id"]})
+
+        if not therapist:
+            return jsonify({"error": "Therapist details not found"}), 404
+
+        return jsonify({
+            "therapist_name": therapist["name"],
+            "specialization": therapist["specialization"],
+            "date": appointment["date"],
+            "time": appointment["time"],
+            "amount_paid": appointment["amount_paid"]
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/details')
 def details():
@@ -717,90 +491,106 @@ def details():
 def mentalpayment():
     return render_template('mentalpayment.html')
 
+@app.route("/confirm_booking", methods=["POST"])
+def confirm_booking():
+    user_name = request.form["name"]
+    email = request.form["email"]
+    phone = request.form["phone"]
+    therapist_name = request.form["therapist"]
+    session_date = request.form["date"]
+    session_time = request.form["time"]
+    amount_paid = request.form["amount"]
+
+    # Store in MongoDB
+    mongo.db.appointments.insert_one({
+        "user_name": user_name,
+        "email": email,
+        "phone": phone,
+        "therapist": therapist_name,
+        "date": session_date,
+        "time": session_time,
+        "amount_paid": amount_paid
+    })
+
+    return redirect("/booking_success")
+
+# Route to display booking success page
+@app.route("/booking_success")
+def booking_success():
+    return "Booking confirmed! Your session has been scheduled."
+
 @app.route('/vitalitycheckout')
 def vitalitycheckout():
     return render_template('vitalitycheckout.html')
 
 @app.route('/store_quiz_response', methods=['POST'])
 def store_quiz_response():
-    print("Session Data:", session)  # ✅ Debugging log
-
     if 'user_id' not in session:
-        print("Error: User not logged in")
+        print("❌ User not logged in")
         return jsonify({"error": "User not logged in"}), 401
 
     try:
         data = request.json
-        print("Received Data:", data)  # ✅ Debugging log
+        print("📩 Received Data:", data)  # ✅ Debugging log
 
         user_id = session['user_id']
         question_id = data.get('question_id')
         selected_option = data.get('selected_option')
+        score = data.get('score', 0)  # Default score is 0 if missing
         quiz_category = data.get('quiz_category')
 
         if not question_id or not selected_option or not quiz_category:
-            print("Error: Incomplete data received!")
+            print("❌ Error: Incomplete data received!")
             return jsonify({"error": "Incomplete data"}), 400
 
-        # ✅ Find the existing quiz response document for the user
-        user_quiz = quiz_responses.find_one({"user_id": str(user_id), "quiz_category": quiz_category})
+        # ✅ Debugging before saving to MongoDB
+        print(f"📝 Storing: user_id={user_id}, question_id={question_id}, answer={selected_option}, score={score}")
 
-        if user_quiz:
-            # ✅ Update existing document by adding new response
-            quiz_responses.update_one(
-                {"user_id": str(user_id), "quiz_category": quiz_category},
-                {"$set": {f"responses.{question_id}": selected_option}}
-            )
-            print(f"Updated quiz response for {user_id} in {quiz_category}")
-        else:
-            # ✅ Create a new document if this is the first response
-            quiz_data = {
-                "user_id": str(user_id),
-                "quiz_category": quiz_category,
-                "responses": {question_id: selected_option},
-                "timestamp": datetime.utcnow()
-            }
-            quiz_responses.insert_one(quiz_data)
-            print(f"Created new quiz response for {user_id} in {quiz_category}")
+        # ✅ Ensure correct MongoDB structure
+        result = quiz_responses.update_one(
+            {"user_id": str(user_id), "quiz_category": quiz_category},
+            {"$set": {
+                f"responses.{question_id}": {
+                    "answer": selected_option,  
+                    "score": score,  
+                    "timestamp": datetime.utcnow()
+                }
+            }},
+            upsert=True
+        )
 
-        return jsonify({"message": "Response stored successfully"}), 201
+        # ✅ Debugging MongoDB Update
+        print("✅ MongoDB Update Result:", result.raw_result)
+
+        return jsonify({"message": "Response stored successfully!"}), 201
 
     except Exception as e:
-        print("Error in /store_quiz_response:", str(e))  # ✅ Log error
-        return jsonify({"error": "Internal Server Error"}), 500
-
-@app.route('/save_quiz_response', methods=['POST'])
-def save_quiz_response():
+        print("🚨 Error in /store_quiz_response:", str(e))  # ✅ Log error
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/calculate_score', methods=['GET'])
+def calculate_score():
     if 'user_id' not in session:
-        return {"error": "User not logged in"}, 401
+        return jsonify({"error": "User not logged in"}), 401
 
     user_id = session['user_id']
-    data = request.json  
 
-    quiz_category = data.get('quiz_category')
-    level = data.get('level')
-    answers = data.get('answers')
+    # ✅ Fetch user responses from MongoDB
+    user_quiz = quiz_responses.find_one({"user_id": str(user_id), "quiz_category": "mental_health"})
 
-    if not quiz_category or not level or not answers:
-        return {"error": "Missing data"}, 400
+    if not user_quiz or "responses" not in user_quiz:
+        return jsonify({"error": "No responses found"}), 404
 
-    response_data = {
-        "level": level,
-        "answers": answers,
-        "timestamp": datetime.utcnow()
-    }
+    total_score = sum(response.get("score", 0) for response in user_quiz["responses"].values())
 
-    # 🔥 Ensure a single document per user & category
-    mongo.db.quiz_responses.update_one(
-        {"user_id": user_id, "quiz_category": quiz_category},  # Match user and category
-        {
-            "$setOnInsert": {"user_id": user_id, "quiz_category": quiz_category},  # Create only if it doesn't exist
-            "$push": {"responses": response_data}  # Add new quiz responses to the array
-        },
-        upsert=True  # Ensure a document is created if none exists
-    )
+    # ✅ Return the total score
+    return jsonify({"total_score": total_score})
 
-    return {"message": "Response saved successfully"}, 200
+@app.route('/logout')
+def logout():
+    """Clear the session and log out the user."""
+    session.clear()
+    return redirect(url_for('login_page'))
 
 if __name__ == '__main__':
     app.run(debug=True)
