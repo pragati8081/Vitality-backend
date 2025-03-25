@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<!--suppress ALL -->
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vitality</title>
   <style>
+    @font-face {
+      font-family: "Raquel";
+      src: url(fonts/Raquel.ttf);
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -13,8 +17,53 @@
       color: black;
       height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 40px;
+      background-color: #A91E43;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 15px;
+      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      margin-bottom: 50px;
+    }
+
+    .home-button {
+      position: absolute;
+      left: 30px;
+      background-color: #d0a485;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s ease;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-button:hover {
+      background-color: #b08973;
+      transform: translateY(-2px);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      height: 40px; /* Adjust as needed */
     }
 
     .container {
@@ -25,6 +74,7 @@
       border-radius: 20px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
       overflow: hidden;
+      margin-top: 100px;
     }
 
     .image-section {
@@ -35,14 +85,6 @@
       align-items: center;
     }
 
-    .image-section::before {
-      content: "";
-      width: 70%;
-      height: 80%;
-      background: linear-gradient(135deg, #ff7e5f, #feb47b);
-      border-radius: 10px;
-    }
-
     .content-section {
       flex: 2;
       padding: 2rem;
@@ -51,12 +93,6 @@
       justify-content: space-between;
       align-items: center;
       background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 1));
-    }
-
-    .header {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: bold;
     }
 
     .question {
@@ -129,7 +165,20 @@
       min-width: 200px; /* Set a minimum width */
     }
 
-    /* Hover effect for all buttons */
+    .option-5 {
+      background: #e9688b;
+      border: 2px solid #e9688b;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      min-width: 200px; 
+    }
+    
     .options button:hover {
       background: rgba(255, 255, 255, 0.4);
       color: #000;
@@ -162,16 +211,25 @@
   </style>
 </head>
 <body>
+
+  <div class="header">
+    <button class="home-button" onclick="goToHome()">Home</button>
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+      <span style="font-size: 1.5rem; font-weight: bold;">Vitality</span>
+    </div>
+  </div>
+
   <div class="container">
     <div class="image-section">
-        <img src="{{ url_for('static', filename='images/download_7.jpeg') }}" alt="Image">
+        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\Made For All Bodies Through Sustainability And Clean Products, Meet FEHH.jpeg" alt="Placeholder Image">
     </div>
     <div class="content-section">
-      <div class="header">SKIN</div>
-      <div class="question"> Are you looking to reduce acne or breakouts?  </div>
+      <div class="question">9. Are you looking for better sleep quality and relaxation?</div>
       <div class="options">
         <button class="option-1" onclick="selectOption(1)">No</button>
         <button class="option-2" onclick="selectOption(2)">Yes</button>
+        
       </div>
       <div class="navigation">
         <button onclick="goBack()">BACK</button>
@@ -213,7 +271,9 @@
     function goNext() {
         window.location.href = '/goalsQ10';
     }
-
+    function goToHome() {
+      window.location.href = '/physicalhome'; // Change to actual homepage URL
+    }
   </script>
 </body>
 </html>

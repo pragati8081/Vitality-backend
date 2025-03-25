@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<!--suppress HtmlUnknownTarget -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basics Page</title>
     <style>
+@font-face {
+      font-family: "Raquel";
+      src: url(fonts/Raquel.ttf);
+    }
+        
         * {
             margin: 0;
             padding: 0;
@@ -33,6 +37,7 @@
         }
 
         .content {
+            font-family: Raque;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -43,7 +48,8 @@
         }
 
         .content h1 {
-            font-size: 2.5rem;
+            font-family: Raquel;
+            font-size: 3.5rem;
             margin-bottom: 10px;
             color: #333; /* Text color */
         }
@@ -76,17 +82,21 @@
 </head>
 <body>
     <div class="left">
-        <img src="{{ url_for('static', filename='images/beauty_jewelry_portfolio.jpeg') }}" alt="Beauty & Jewelry Portfolio">
+        <img src="{{ url_for('static', filename='images/beauty_jewelry_portfolio.jpeg') }}" alt="Left side image">
     </div>
     <div class="right">
-        <img src="" alt="Right side image">
+        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\TG_ AliceFM _ текстура мятой бумаги • сторис • визуал • инстаграм • дизайн.jpeg" alt="Right side image">
         <div class="content">
             <h1>BASICS</h1>
             <hr>
             <br>
+            <p style="font-size: 1.2rem; color: #555; margin-bottom: 15px;">
+                Let's start with the fundamentals! Answer a few quick questions to help us understand your basic health and set the foundation for your wellness journey.
+            </p>
             <br>
             <br>
-
+            <br>
+            
             <div class="button-container">
                 <button onclick="nextPage()">Next</button>
             </div>

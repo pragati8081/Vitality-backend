@@ -252,7 +252,7 @@
     <!-- Header -->
   <header class="header">
     <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="images/vitality_logo.jpeg" alt="Vitality Logo" class="logo">
+    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
     <h1>Vitality</h1>
   </header>
 
@@ -261,7 +261,7 @@
     <div class="booking-container">
         <!-- Left Side: Session Info -->
         <div class="session-info">
-            <img src="images/vitality_logo.jpeg" alt="Vitality Health">
+            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Health">
             <h3>1:1 Therapy Session (60 minutes)</h3>
             <p>Our software matches you to the most compatible psychologist according to your needs.</p>
             <div class="duration">
@@ -359,9 +359,17 @@
         updateCalendar();
 
         document.getElementById("submitButton").addEventListener("click", function() {
-    // Example: Redirect to a confirmation page
-    window.location.href = '/details'; // Change this to your desired URL
+    let selectedTherapist = "Dr. John Doe"; // Example, replace with actual selection
+    let selectedDate = document.querySelector(".calendar div.selected").textContent;
+    let selectedTime = document.querySelector(".time-slot.selected-slot").textContent;
+
+    localStorage.setItem("selectedTherapist", selectedTherapist);
+    localStorage.setItem("selectedDate", selectedDate);
+    localStorage.setItem("selectedTime", selectedTime);
+
+    window.location.href = "/details"; // Redirect to details page
 });
+
 
 function goToHome() {
     window.location.href = '/mentalhome'; // Change this to the actual homepage URL

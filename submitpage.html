@@ -6,10 +6,10 @@
     <title>Vitality - Mental Health Assessment</title>
     <style>
         @font-face {
-      font-family: "Raquel";
-      src: url(fonts/Raquel.ttf);
-    }
-    * {
+            font-family: "Raquel";
+            src: url(fonts/Raquel.ttf);
+        }
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -25,57 +25,54 @@
             height: 100vh;
         }
 
-        /* Header */
-    .header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      height: 50px;
-      background-color: #A91E43;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 5px 15px; 
-      box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #A91E43;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 15px;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
 
-    .home-button {
-      position: absolute;
-      left: 15px;
-      background-color: #d0a485;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 15px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.3s ease;
-      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
-    }
+        .home-button {
+            position: absolute;
+            left: 15px;
+            background-color: #d0a485;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s ease;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+        }
 
-    .home-button:hover {
-      background-color: #b08973;
-      transform: translateY(-2px);
-    }
+        .home-button:hover {
+            background-color: #b08973;
+            transform: translateY(-2px);
+        }
 
-    .logo {
-  width: 35px;
-  height: 35px;
-  border-radius: 8px;
-  margin-right: 10px;
-}
+        .logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
 
+        h1 {
+            font-family: 'Raquel';
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+        }
 
-    h1 {
-        font-family: 'Raquel';
-      font-size: 22px;
-      font-weight: bold;
-      margin: 0;
-    }
-
-        /* Main Content */
         .container {
             text-align: center;
             padding: 20px;
@@ -125,37 +122,116 @@
             border-radius: 50%;
             filter: blur(50px);
         }
+
+        .quiz-score {
+            font-size: 28px;
+            font-weight: bold;
+            color: #A91E43;
+            margin-bottom: 5px;
+        }
+
+        .risk-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: #9d0853;
+            margin-bottom: 15px;
+        }
+
+        .loading-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #A91E43;
+            border-radius: 50%;
+            border-top: 5px solid transparent;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #score-container {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-  <header class="header">
-    <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
-    <h1>Vitality</h1>
-  </header>
+    <header class="header">
+        <button class="home-button" onclick="goToHome()">Home</button>
+        <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+        <h1>Vitality</h1>
+    </header>
 
-    <!-- Main Content -->
     <div class="container">
-        <h2>This tool is informational & not meant to replace professional medical advice or a diagnosis.</h2>
-        
-        <p>We recommend seeing a Mental Health Counsellor or Doctor immediately. To book a session, press submit.</p>
-        <button class="submit-btn" onclick="bookSession()">Submit</button>
+        <div class="loading-circle"></div>
+
+        <div id="score-container">
+            <h2 class="quiz-score">Your Quiz Score is: <span id="quizScore">x</span>/100</h2>
+            <p class="risk-message" id="riskMessage">Loading...</p>
+            <br>
+            <h2>This tool is informational & not meant to replace professional medical advice or a diagnosis.</h2>
+            <p>We recommend seeing a Mental Health Counsellor or Doctor immediately. To book a session, press submit.
+            </p>
+            <button class="submit-btn" onclick="bookSession()">Submit</button>
+            <br><br>
+                If you DO NOT want to continue, please press the HOME button on the top left of the window. Thank you and take care:)
+        </div>
     </div>
 
     <div class="gradient-bg"></div>
 
     <script>
         function goToHome() {
-    window.location.href = '/mentalhome'; // Change this to the actual homepage URL
-}
-
+            window.location.href = '/mentalhome';
+        }
 
         function bookSession() {
             alert("Redirecting to session booking...");
-            window.location.href = '/booksession'; // Change this to the actual booking page URL
+            window.location.href = '/booksession';
         }
+
+        function fetchScore() {
+            setTimeout(() => {
+                fetch('/calculate_score')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector(".loading-circle").style.display = "none"; 
+                    document.getElementById("score-container").style.display = "block"; 
+
+                    if (data.total_score !== undefined) {
+                        let finalScore = (data.total_score / 48) * 100;
+                        document.getElementById("quizScore").innerText = Math.round(finalScore);
+                        suggestRiskMessage(finalScore);
+                    } else {
+                        document.getElementById("quizScore").innerText = "Error!";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching score:", error);
+                    document.getElementById("quizScore").innerText = "Error!";
+                });
+            }, 3000);
+        }
+
+        function suggestRiskMessage(score) {
+            let message = "";
+            if (score <= 30) {
+                message = "😊 You seem to be doing well! No immediate therapy is needed.";
+            } else if (score > 30 && score <= 60) {
+                message = "🔹 You may benefit from occasional therapy sessions.";
+            } else if (score > 60 && score <= 85) {
+                message = "⚠️ Consider regular therapy sessions.";
+            } else {
+                message = "🚨 High distress detected! A therapist consultation is strongly recommended.";
+            }
+            document.getElementById("riskMessage").innerText = message;
+        }
+
+        window.onload = fetchScore;
     </script>
 
 </body>

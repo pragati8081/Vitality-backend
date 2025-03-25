@@ -62,6 +62,7 @@
   margin-right: 10px;
 }
 
+
     h1 {
       font-size: 22px;
       font-weight: bold;
@@ -148,8 +149,7 @@
     .question-option.option-4 { background-color: #D3496E; }
     .question-option.option-5 { background-color: #ee7394; }
     .question-option.option-6 { background-color: #f69eb6; }
-    .question-option.option-7 { background-color: #f9b7c8; }
-    .question-option.option-8 { background-color: #f3c8d4; }
+
 
     /* Navigation Buttons */
     .navigation {
@@ -180,12 +180,13 @@
   </style>
 </head>
 <body>
+
   <!-- Header -->
-  <header class="header">
-    <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
-    <h1>Vitality</h1>
-  </header>
+<header class="header">
+  <button class="home-button" onclick="goToHome()">Home</button>
+  <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+  <h1>Vitality</h1>
+</header>
 
   <!-- Main Content -->
   <div class="container">
@@ -196,66 +197,77 @@
       </p>
 
       <div class="questions-section">
-        <p class="questions-title"> Would you prefer a therapist who is casual or formal?</p>
-        <button class="question-option option-1" onclick="selectOption(this, 'option1')"> Casual  </button>
-        <button class="question-option option-2" onclick="selectOption(this, 'option2')"> Somewhat casual        </button>
-        <button class="question-option option-3" onclick="selectOption(this, 'option3')"> No preference  </button>
-        <button class="question-option option-4" onclick="selectOption(this, 'option4')">Somewhat formal   </button>
-        <button class="question-option option-5" onclick="selectOption(this, 'option5')"> Formal</button>
+        <p class="questions-title">  . How difficult have these feelings made it for you to do your work, take care of
+          things at home, or get along with others?
+             </p>
+             <button class="question-option option-1" onclick="selectOption(this, 'Not at all', 0)">A: Not at all</button>
+             <button class="question-option option-2" onclick="selectOption(this, 'Somewhat difficult', 1)">B: Somewhat difficult</button>
+             <button class="question-option option-3" onclick="selectOption(this, 'Very difficult', 2)">C: Very difficult</button>
+             <button class="question-option option-4" onclick="selectOption(this, 'Extremely difficult', 3)">D: Extremely difficult</button>
+             
       </div>
 
       <div class="navigation">
-        <button class="nav-button back-button" onclick="goBack()">&#60;- Back</button>
-        <button class="nav-button next-button" onclick="goNext()">Next -&gt;</button>
+        <button class="nav-button back-button" onclick="goBack()">← Back</button>
+        <button class="nav-button next-button" onclick="goNext()">Next →</button>
       </div>
+      
     </div>
+  </div>
+
   </div>
 
   <script>
     let selectedOption = "";
+    let selectedScore = 0;
   
-    function selectOption(button, identity) {
+    function selectOption(button, answer, score) {
       document.querySelectorAll('.question-option').forEach(btn => btn.classList.remove('selected'));
       button.classList.add('selected');
-      selectedOption = identity;
+      
+      selectedOption = answer;
+      selectedScore = score;
+      console.log("📝 Selected Option:", selectedOption, "| Score:", selectedScore);
     }
   
     function goNext() {
       if (selectedOption === "") {
-        alert("Please select an option before proceeding.");
-      } else {
-        fetch('/store_quiz_response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            question_id: 'mental14',
-            selected_option: selectedOption,
-            quiz_category: 'mental_health'
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message) {
-            console.log("Response saved successfully!");
-            window.location.href = '/mental15';  // Change to the actual next page URL if available
-          } else {
-            alert("Failed to save response. Please try again.");
-          }
-        })
-        .catch(error => console.error('Error:', error));
+        alert("❌ Please select an option before proceeding.");
+        return;
       }
+  
+      // ✅ Send response to the backend
+      fetch('/store_quiz_response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_id: 'mental14',  // ✅ Unique ID for this question
+          selected_option: selectedOption,  // ✅ Selected answer
+          score: selectedScore,  // ✅ Assigned score
+          quiz_category: 'mental_health'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          console.log("✅ Response saved successfully!");
+          window.location.href = '/mental15';  // ✅ Navigate to the next question
+        } else {
+          alert("❌ Failed to save response. Please try again.");
+        }
+      })
+      .catch(error => console.error('❌ Error:', error));
     }
   
     function goBack() {
-      window.location.href = '/mental13';
+      window.location.href = '/mental13';  // ✅ Navigate to previous question
     }
   
     function goToHome() {
-      window.location.href = '/';
+      window.location.href = '/mentalhome';  // ✅ Navigate to homepage
     }
   </script>
+  
   
 </body>
 </html>

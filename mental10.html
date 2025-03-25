@@ -62,6 +62,7 @@
   margin-right: 10px;
 }
 
+
     h1 {
       font-size: 22px;
       font-weight: bold;
@@ -140,21 +141,14 @@
       border: 3px solid #feebf0;
       background-color: #7D1733 !important;
     }
-    
+
     /* Option Colors */
-    .question-option.option-1 { background-color: #8d1434; }
-    .question-option.option-2 { background-color: #a51c41; }
-    .question-option.option-3 { background-color: #b22b4f; }
-    .question-option.option-4 { background-color: #ca365e; }
-    .question-option.option-5 { background-color: #e0456e; }
-    .question-option.option-6 { background-color: #ed507a; }
-    .question-option.option-7 { background-color: #f25f89; }
-    .question-option.option-8 { background-color: #fe6f98; }
-    .question-option.option-9 { background-color: #fe93b1; }
-    .question-option.option-10 { background-color: #f7aac0; }
-    .question-option.option-11 { background-color: #fdcad8; }
-    .question-option.option-12 { background-color: #fbe1e8; }
-    .question-option.option-13 { background-color: #f7e1e7; }
+    .question-option.option-1 { background-color: #A91E43; }
+    .question-option.option-2 { background-color: #B71F47; }
+    .question-option.option-3 { background-color: #CA2C56; }
+    .question-option.option-4 { background-color: #D3496E; }
+    .question-option.option-5 { background-color: #ee7394; }
+    .question-option.option-6 { background-color: #f69eb6; }
 
 
     /* Navigation Buttons */
@@ -186,12 +180,13 @@
   </style>
 </head>
 <body>
+
   <!-- Header -->
-  <header class="header">
-    <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
-    <h1>Vitality</h1>
-  </header>
+<header class="header">
+  <button class="home-button" onclick="goToHome()">Home</button>
+  <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+  <h1>Vitality</h1>
+</header>
 
   <!-- Main Content -->
   <div class="container">
@@ -202,71 +197,70 @@
       </p>
 
       <div class="questions-section">
-        <p class="questions-title"> What led you to consider therapy today? </p>
-        <button class="question-option option-1" onclick="selectOption(this, 'option1')">  I've been feeling depressed </button>
-        <button class="question-option option-2" onclick="selectOption(this, 'option2')"> I feel anxious or overwhelmed</button>
-        <button class="question-option option-3" onclick="selectOption(this, 'option3')"> My mood is interfering with my job/school performance  </button>
-        <button class="question-option option-4" onclick="selectOption(this, 'option4')"> I struggle with building or maintaining relationships  </button>
-        <button class="question-option option-5" onclick="selectOption(this, 'option5')"> I can't find purpose and meaning in my life</button>
-        <button class="question-option option-6" onclick="selectOption(this, 'option6')"> I am grieving  </button>
-        <button class="question-option option-7" onclick="selectOption(this, 'option7')"> I have experienced trauma </button>
-        <button class="question-option option-8" onclick="selectOption(this, 'option8')"> I need to talk through a specific challenge</button>
-        <button class="question-option option-9" onclick="selectOption(this, 'option9')"> I want to gain self confidence </button>
-        <button class="question-option option-10" onclick="selectOption(this, 'option10')"> I want to improve myself but I don't know where to start </button>
-        <button class="question-option option-11" onclick="selectOption(this, 'option11')"> Recommended to me (friend, family, doctor)</button>
-        <button class="question-option option-12" onclick="selectOption(this, 'option12')"> Just exploring        </button>
-        <button class="question-option option-13" onclick="selectOption(this, 'option13')"> Other </button>
+        <p class="questions-title">  . In the last 2 weeks, how often have you been bothered by feeling bad about
+          yourself — or that you are a failure or have let yourself or your family down?    </p>
+          <button class="question-option option-1" onclick="selectOption(this, 'Not at all', 0)">A: Not at all</button>
+          <button class="question-option option-2" onclick="selectOption(this, 'Several days', 1)">B: Several days</button>
+          <button class="question-option option-3" onclick="selectOption(this, 'More than half the days', 2)">C: More than half the days</button>
+          <button class="question-option option-4" onclick="selectOption(this, 'Nearly every day', 3)">D: Nearly every day</button>
+          
       </div>
 
       <div class="navigation">
-        <button class="nav-button back-button" onclick="goBack()">&#60;- Back</button>
-        <button class="nav-button next-button" onclick="goNext()">Next -&gt;</button>
+        <button class="nav-button back-button" onclick="goBack()">← Back</button>
+        <button class="nav-button next-button" onclick="goNext()">Next →</button>
       </div>
+      
     </div>
   </div>
   <script>
     let selectedOption = "";
+    let selectedScore = 0;
   
-    function selectOption(button, identity) {
+    function selectOption(button, answer, score) {
       document.querySelectorAll('.question-option').forEach(btn => btn.classList.remove('selected'));
       button.classList.add('selected');
-      selectedOption = identity;
+      
+      selectedOption = answer;
+      selectedScore = score;
+      console.log("📝 Selected Option:", selectedOption, "| Score:", selectedScore);
     }
   
     function goNext() {
       if (selectedOption === "") {
-        alert("Please select an option before proceeding.");
-      } else {
-        fetch('/store_quiz_response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            question_id: 'mental10',
-            selected_option: selectedOption,
-            quiz_category: 'mental_health'
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message) {
-            console.log("Response saved successfully!");
-            window.location.href = '/mental11';  // Change to the actual next page URL if available
-          } else {
-            alert("Failed to save response. Please try again.");
-          }
-        })
-        .catch(error => console.error('Error:', error));
+        alert("❌ Please select an option before proceeding.");
+        return;
       }
+  
+      // ✅ Send response to the backend
+      fetch('/store_quiz_response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_id: 'mental10',  // ✅ Unique ID for this question
+          selected_option: selectedOption,  // ✅ Selected answer
+          score: selectedScore,  // ✅ Assigned score
+          quiz_category: 'mental_health'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          console.log("✅ Response saved successfully!");
+          window.location.href = '/mental11';  // ✅ Navigate to the next question
+        } else {
+          alert("❌ Failed to save response. Please try again.");
+        }
+      })
+      .catch(error => console.error('❌ Error:', error));
     }
   
     function goBack() {
-      window.location.href = '/mental9';
+      window.location.href = '/mental9';  // ✅ Navigate to previous question
     }
   
     function goToHome() {
-      window.location.href = '/';
+      window.location.href = '/mentalhome';  // ✅ Navigate to homepage
     }
   </script>
   

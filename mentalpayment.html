@@ -237,26 +237,27 @@
             <input type="text" id="amount" value="₹899.00" readonly>
 
             <label>Full Name</label>
-            <input type="text" value="Shallika Seth" readonly>
+<input type="text" id="fullName" readonly>
 
-            <label>Email*</label>
-            <input type="email" value="shallika.seth2316@gmail.com" readonly>
+<label>Email*</label>
+<input type="email" id="email" readonly>
 
-            <label>Phone *</label>
-            <div class="phone-input">
-                <select>
-                    <option value="+91">🇮🇳 +91</option>
-                </select>
-                <input type="text" placeholder="Enter phone number">
-            </div>
+<label>Phone *</label>
+<div class="phone-input">
+    <select>
+        <option value="+91">🇮🇳 +91</option>
+    </select>
+    <input type="text" id="phone" readonly>
+</div>
 
+<button id="pay-btn" onclick="confirmPayment()">Pay ₹899.00</button>
             <label>Referral / Discount Code</label>
             <div class="discount-code">
                 <input type="text" id="discount" placeholder="Enter code">
                 <button onclick="applyDiscount()">Apply</button>
             </div>
 
-            <button id="pay-btn">Pay ₹899.00</button>
+            <button id="pay-btn" onclick="confirmPayment()">Pay ₹899.00</button>
             <p class="secure">🔒 Payments are secure and encrypted</p>
         </div>
     </div>
@@ -275,6 +276,24 @@
                 alert("Invalid discount code.");
             }
         }
+
+        function confirmPayment() {
+        fetch("/confirm_booking", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                "name": localStorage.getItem("selectedUser"),
+                "email": localStorage.getItem("selectedEmail"),
+                "phone": localStorage.getItem("selectedPhone"),
+                "therapist": localStorage.getItem("selectedTherapist"),
+                "date": localStorage.getItem("selectedDate"),
+                "time": localStorage.getItem("selectedTime"),
+                "amount": "899"
+            })
+        }).then(() => {
+            window.location.href = "/booking_success";
+        });
+    }
 
         function goToHome() {
     window.location.href = '/mentalhome'; // Change this to the actual homepage URL

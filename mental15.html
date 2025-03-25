@@ -31,7 +31,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 5px 15px;
+      padding: 5px 15px; 
       box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
       z-index: 1000;
     }
@@ -72,7 +72,7 @@
     /* Main Container */
     .container {
       max-width: 700px;
-      margin: 70px auto 20px;
+      margin: 70px auto 20px; /* Adjusted for fixed header */
       padding: 30px;
     }
 
@@ -86,7 +86,6 @@
     .instructions {
       font-size: 20px;
       font-weight: bold;
-      margin-top: 3px;
       margin-bottom: 10px;
       color: #B71F47;
     }
@@ -110,47 +109,29 @@
     }
 
     .questions-title {
-      font-size: 20px;
+      font-size: 25px;
       font-weight: bold;
       margin-bottom: 20px;
     }
 
-    .question-option {
-      display: block;
-      width: 85%;
-      margin: 12px auto;
-      padding: 15px;
-      font-size: 16px;
+    /* Country Dropdown */
+    .country-label {
+      font-size: 18px;
       font-weight: bold;
-      color: #fff;
-      border: none;
+      margin-bottom: 8px;
+    }
+
+    .country-dropdown {
+      width: 90%;
+      max-width: 400px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.6); /* Translucent */
+      border: 2px solid #A91E43;
       border-radius: 8px;
+      outline: none;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-      transform: translateY(0);
     }
-
-    .question-option:hover {
-      transform: translateY(-3px);
-      box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Selected Option */
-    .selected {
-      border: 3px solid #feebf0;
-      background-color: #7D1733 !important;
-    }
-
-    /* Option Colors */
-    .question-option.option-1 { background-color: #A91E43; }
-    .question-option.option-2 { background-color: #B71F47; }
-    .question-option.option-3 { background-color: #CA2C56; }
-    .question-option.option-4 { background-color: #D3496E; }
-    .question-option.option-5 { background-color: #ee7394; }
-    .question-option.option-6 { background-color: #f69eb6; }
-    .question-option.option-7 { background-color: #f9b7c8; }
-    .question-option.option-8 { background-color: #f3c8d4; }
 
     /* Navigation Buttons */
     .navigation {
@@ -197,10 +178,12 @@
       </p>
 
       <div class="questions-section">
-        <p class="questions-title"> How would you rate your current physical health? </p>
-        <button class="question-option option-1" onclick="selectOption(this, 'option1')"> Good  </button>
-        <button class="question-option option-2" onclick="selectOption(this, 'option2')"> Fair  </button>
-        <button class="question-option option-3" onclick="selectOption(this, 'option3')"> Poor  </button>
+        <p class="questions-title">What is your preferred therapy language?</p>
+        <br>
+        <select id="country" class="country-dropdown">
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+        </select>
       </div>
 
       <div class="navigation">
@@ -210,40 +193,36 @@
     </div>
   </div>
   <script>
-    let selectedOption = "";
-  
-    function selectOption(button, identity) {
-      document.querySelectorAll('.question-option').forEach(btn => btn.classList.remove('selected'));
-      button.classList.add('selected');
-      selectedOption = identity;
-    }
-  
     function goNext() {
-      if (selectedOption === "") {
-        alert("Please select an option before proceeding.");
-      } else {
-        fetch('/store_quiz_response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            question_id: 'mental15',
-            selected_option: selectedOption,
-            quiz_category: 'mental_health'
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message) {
-            console.log("Response saved successfully!");
-            window.location.href = '/mental16';  // Change to the actual next page URL if available
-          } else {
-            alert("Failed to save response. Please try again.");
-          }
-        })
-        .catch(error => console.error('Error:', error));
+      let selectedOption = document.getElementById("country").value; // Get selected language
+  
+      if (!selectedOption) {
+          alert("❌ Please select a language before proceeding.");
+          return;
       }
+  
+      fetch('/store_quiz_response', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              question_id: 'mental15',
+              selected_option: selectedOption,
+              quiz_category: 'mental_health'
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log("✅ Server Response:", data);  // Debugging step
+          if (data.message) {
+              window.location.href = '/mental16';  // ✅ Navigate to the next page
+          } else {
+              alert("❌ Failed to save response. Please try again.");
+          }
+      })
+      .catch(error => {
+          console.error('❌ Error:', error);
+          alert("There was an error processing your request.");
+      });
     }
   
     function goBack() {
@@ -251,7 +230,7 @@
     }
   
     function goToHome() {
-      window.location.href = '/';
+      window.location.href = '/mentalhome';  // Change this to your homepage URL
     }
   </script>
   

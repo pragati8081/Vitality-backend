@@ -609,7 +609,7 @@ nav ul li a:hover {
             <h1>VITALITY</h1>
             <p>Your Personalized Path to Wellness</p>
         </div>
-        <div class="circle-icon">
+        <div class="circle-icon" onclick="checkLoginAndRedirect('/profilepage')">
             <img src="{{ url_for('static', filename='images/Premium_PSD___Profile_Icon_In_Minimalist_3D_Render-removebg-preview.png') }}" alt="Profile Picture">
             <div class="tooltip">Click here to log in!</div>
         </div>
@@ -625,8 +625,6 @@ nav ul li a:hover {
         </ul>
     </nav>
     
-    
-
     <div class="carousel">
         <div class="carousel-inner">
             <img src="{{ url_for('static', filename='images/welcometovitality.png') }}" alt="Carousel Image 1">
@@ -708,7 +706,7 @@ nav ul li a:hover {
     <div class="quiz-section">
         <img src="{{ url_for('static', filename='images/Untitled_design.png') }}" alt="Quiz Image" class="quiz-image">
         <div class="content-overlay">
-            <button class="register-btn" onclick="redirectToQuiz()">Take Quiz</button>
+            <button class="register-btn" onclick="checkLoginAndRedirect('/options')">Take Quiz</button>
             <p>Your personalized journey starts here!</p>
         </div>
     </div>
@@ -784,6 +782,8 @@ nav ul li a:hover {
                 <p>Text line 3</p>
                 <p>Text line 4</p>
             </div>
+        </div>
+        </div>
         </div>
     </div>
 
@@ -936,8 +936,19 @@ document.addEventListener("DOMContentLoaded", () => {
         
     
 });
+function checkLoginAndRedirect(targetPage) {
+    fetch('/check_login')
+        .then(response => response.json())
+        .then(data => {
+            if (data.logged_in) {
+                window.location.href = targetPage;
+            } else {
+                window.location.href = '/login';  // Redirect to login page if not logged in
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
 
-
-    </script>
+</script>
 </body>
 </html>

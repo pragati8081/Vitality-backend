@@ -215,14 +215,16 @@
         <div class="sidebar">
             <div class="profile-img">
                 <img id="profile-pic" src="https://via.placeholder.com/120" alt="Profile Picture">
-                <input type="file" id="imageUpload" accept="image/*">
+                <input type="file" id="imageUpload" accept="image/*" onchange="uploadProfileImage()">
             </div>
-            <p>USERNAME</p>
+            
             <div class="menu">
                 <button class="active" onclick="showSection('profile')">Profile</button>
                 <button onclick="showSection('password')">Password</button>
                 <button onclick="showSection('orders')">Orders</button>
                 <button onclick="showSection('therapy')">Therapy</button>
+                <button onclick="logoutUser('Logout')">Logout</button>
+
             </div>
         </div>
 
@@ -230,83 +232,188 @@
         <div class="profile-container">
             <div class="profile-card" id="content-area">
                 <!-- Default Profile Section -->
-                <h2>PROFILE</h2>
-                <div class="form-group"><label>Name</label><input type="text"></div>
-                <div class="form-group"><label>Username</label><input type="text"></div>
-                <div class="form-group"><label>Email</label><input type="email"></div>
-                <div class="form-group"><label>Address</label><input type="text"></div>
-                <div class="form-group"><label>Phone Number</label><input type="text"></div>
-                <div class="buttons"><button class="save-btn" onclick="saveProfile()">Save</button></div>
+                    <h2>PROFILE</h2>
+                    <div class="form-group"><label>Name</label><input type="text" id="name"></div>
+                    <div class="form-group"><label>Username</label><input type="text" id="username"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="email"></div>
+                    <div class="form-group"><label>Address</label><input type="text" id="address"></div>
+                    <div class="form-group"><label>Phone Number</label><input type="text" id="phone"></div>
+                    <div class="buttons"><button class="save-btn" onclick="saveProfile()">Save</button></div>
+                </div>
+                
             </div>
         </div>
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    fetchProfile();
+});
+
+function fetchProfile() {
+    fetch('/get_profile')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Profile fetch error:", data.error);
+                alert("Error: " + data.error);
+                window.location.href = "/login"; 
+            } else {
+                // Combine first_name and last_name if they exist
+                let fullName = (data.first_name || "") + " " + (data.last_name || "");
+                document.getElementById("name").value = fullName.trim(); // Set full name
+                document.getElementById("username").value = data.username || "";
+                document.getElementById("email").value = data.email || "";
+                document.getElementById("address").value = data.address || "";
+                document.getElementById("phone").value = data.phone || "";
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching profile:", error);
+        });
+}
+
         function goBack() {
             alert("Going back...");
             window.location.href = '/'; // Navigate to the Goals page
 
         }
-
         function saveProfile() {
-            alert("Profile saved successfully!");
-        }
+    const profileData = {
+        username: document.getElementById("username").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        phone: document.getElementById("phone").value.trim()
+    };
 
-        function showSection(section) {
+    if (!profileData.username || !profileData.address || !profileData.phone) {
+        alert("All fields are required.");
+        return;
+    }
+
+    fetch('/save_profile', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => console.error("Error updating profile:", error));
+}
+
+function showSection(section) {
+    document.getElementById("content-area").innerHTML = "";  // Clear existing content
+
     let content = {
         profile: `
             <h2>PROFILE</h2>
-            <div class="form-group"><label>Name</label><input type="text"></div>
-            <div class="form-group"><label>Username</label><input type="text"></div>
-            <div class="form-group"><label>Email</label><input type="email"></div>
-            <div class="form-group"><label>Address</label><input type="text"></div>
-            <div class="form-group"><label>Phone Number</label><input type="text"></div>
+            <div class="form-group"><label>Name</label><input type="text" id="name"></div>
+            <div class="form-group"><label>Username</label><input type="text" id="username"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="email" disabled></div>
+            <div class="form-group"><label>Address</label><input type="text" id="address"></div>
+            <div class="form-group"><label>Phone Number</label><input type="text" id="phone"></div>
             <div class="buttons"><button class="save-btn" onclick="saveProfile()">Save</button></div>
         `,
         password: `
-            <h2>PASSWORD</h2>
-            <div class="form-group"><label>Current Password</label><input type="password"></div>
-            <div class="form-group"><label>New Password</label><input type="password"></div>
-            <div class="form-group"><label>Confirm New Password</label><input type="password"></div>
-            <div class="buttons"><button class="save-btn" onclick="saveProfile()">Save</button></div>
+            <h2>CHANGE PASSWORD</h2>
+            <form id="passwordForm">
+                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
+                <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required></div>
+                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmNewPassword" required></div>
+                <div class="buttons"><button type="submit" class="save-btn">Update Password</button></div>
+           </form>
         `,
-        orders: `<h2>ORDERS</h2><div class="info-box">Your order history will be visible here.</div>`,
-        therapy: `<h2>THERAPY</h2><div class="info-box">Your therapy sessions and progress will be visible here.</div>`
-    
+        therapy: `
+            <h2>THERAPY DETAILS</h2>
+            <div id="therapy-info" class="info-box">Fetching therapist details...</div>
+        `
     };
 
-    async function updatePassword() {
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-        if (newPassword !== confirmNewPassword) {
-            alert('New passwords do not match!');
-            return;
-        }
-
-        const response = await fetch('/update_password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ new_password: newPassword })
-        });
-
-        const result = await response.json();
-        alert(result.message);
-        if (result.success) {
-            window.location.href = '/profilepage';
-        }
-    }
-    // Update the content section
     document.getElementById("content-area").innerHTML = content[section];
 
-    // Remove active class from all buttons
-    document.querySelectorAll(".menu button").forEach(button => button.classList.remove("active"));
+    if (section === "password") {
+        setTimeout(() => {
+            document.getElementById("passwordForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                updatePassword();
+            });
+        }, 100);
+    } else if (section === "therapy") {
+        fetchTherapistDetails(); // Fetch therapist details
+    } else {
+        fetchProfile();
+    }
 
-    // Add active class to the clicked button
+    document.querySelectorAll(".menu button").forEach(button => button.classList.remove("active"));
     document.querySelector(`.menu button[onclick="showSection('${section}')"]`).classList.add("active");
 }
 
+
+function updatePassword() {
+    const currentPassword = document.getElementById("currentPassword").value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmNewPassword = document.getElementById("confirmNewPassword").value.trim();
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        alert("New passwords do not match!");
+        return;
+    }
+
+    fetch('/update_password', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            current_password: currentPassword,
+            password: newPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            document.getElementById("currentPassword").value = "";
+            document.getElementById("newPassword").value = "";
+            document.getElementById("confirmNewPassword").value = "";
+        }
+    })
+    .catch(error => console.error("Error updating password:", error));
+}
+function fetchTherapistDetails() {
+    fetch('/get_therapist_details')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("therapy-info").innerHTML = `<p style="color: red;">${data.error}</p>`;
+            } else {
+                document.getElementById("therapy-info").innerHTML = `
+                    <p><strong>Therapist Name:</strong> ${data.therapist_name}</p>
+                    <p><strong>Specialization:</strong> ${data.specialization}</p>
+                    <p><strong>Appointment Date:</strong> ${data.date}</p>
+                    <p><strong>Time:</strong> ${data.time}</p>
+                    <p><strong>Fee Paid:</strong> ₹${data.amount_paid}</p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching therapist details:", error);
+            document.getElementById("therapy-info").innerHTML = `<p style="color: red;">Failed to load therapist details.</p>`;
+        });
+}
+
+
+function logoutUser() {
+    fetch('/logout', {
+        method: 'GET',
+    }).then(() => {
+        window.location.href = '/login';  // Redirect to login page after logout
+    });
+}
     </script>
 
 </body>

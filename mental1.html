@@ -181,97 +181,102 @@
       </p>
 
       <div class="questions-section">
-        <p class="questions-title">Which country are you in?</p>
+        <p class="questions-title">Which State are you in?</p>
         <br>
-        <label for="country" class="country-label">Select your country:</label> 
+        <label for="country" class="country-label">Select your State:</label> 
         <br>
         <br>
         <select id="country" class="country-dropdown">
-          <option value="">-- Select a Country --</option>
-          <option value="Afghanistan">Afghanistan</option>
-          <option value="Albania">Albania</option>
-          <option value="Algeria">Algeria</option>
-          <option value="Andorra">Andorra</option>
-          <option value="Angola">Angola</option>
-          <option value="Argentina">Argentina</option>
-          <option value="Australia">Australia</option>
-          <option value="Austria">Austria</option>
-          <option value="Bangladesh">Bangladesh</option>
-          <option value="Belgium">Belgium</option>
-          <option value="Brazil">Brazil</option>
-          <option value="Canada">Canada</option>
-          <option value="China">China</option>
-          <option value="Denmark">Denmark</option>
-          <option value="Egypt">Egypt</option>
-          <option value="France">France</option>
-          <option value="Germany">Germany</option>
-          <option value="India">India</option>
-          <option value="Indonesia">Indonesia</option>
-          <option value="Italy">Italy</option>
-          <option value="Japan">Japan</option>
-          <option value="Mexico">Mexico</option>
-          <option value="Netherlands">Netherlands</option>
-          <option value="New Zealand">New Zealand</option>
-          <option value="Nigeria">Nigeria</option>
-          <option value="Norway">Norway</option>
-          <option value="Pakistan">Pakistan</option>
-          <option value="Philippines">Philippines</option>
-          <option value="Russia">Russia</option>
-          <option value="Saudi Arabia">Saudi Arabia</option>
-          <option value="South Africa">South Africa</option>
-          <option value="South Korea">South Korea</option>
-          <option value="Spain">Spain</option>
-          <option value="Sweden">Sweden</option>
-          <option value="Switzerland">Switzerland</option>
-          <option value="United Kingdom">United Kingdom</option>
-          <option value="United States">United States</option>
+          <option value="">-- Select your State/UT --</option>
+          <option value="Andhra Pradesh" data-score="4">Andhra Pradesh</option>
+          <option value="Arunachal Pradesh" data-score="2">Arunachal Pradesh</option>
+          <option value="Assam" data-score="3">Assam</option>
+          <option value="Bihar" data-score="2">Bihar</option>
+          <option value="Chhattisgarh" data-score="2">Chhattisgarh</option>
+          <option value="Goa" data-score="5">Goa</option>
+          <option value="Gujarat" data-score="4">Gujarat</option>
+          <option value="Haryana" data-score="4">Haryana</option>
+          <option value="Himachal Pradesh" data-score="3">Himachal Pradesh</option>
+          <option value="Jharkhand" data-score="3">Jharkhand</option>
+          <option value="Karnataka" data-score="5">Karnataka</option>
+          <option value="Kerala" data-score="5">Kerala</option>
+          <option value="Madhya Pradesh" data-score="3">Madhya Pradesh</option>
+          <option value="Maharashtra" data-score="5">Maharashtra</option>
+          <option value="Manipur" data-score="2">Manipur</option>
+          <option value="Meghalaya" data-score="3">Meghalaya</option>
+          <option value="Mizoram" data-score="3">Mizoram</option>
+          <option value="Nagaland" data-score="2">Nagaland</option>
+          <option value="Odisha" data-score="3">Odisha</option>
+          <option value="Punjab" data-score="4">Punjab</option>
+          <option value="Rajasthan" data-score="3">Rajasthan</option>
+          <option value="Sikkim" data-score="3">Sikkim</option>
+          <option value="Tamil Nadu" data-score="5">Tamil Nadu</option>
+          <option value="Telangana" data-score="5">Telangana</option>
+          <option value="Tripura" data-score="3">Tripura</option>
+          <option value="Uttar Pradesh" data-score="3">Uttar Pradesh</option>
+          <option value="Uttarakhand" data-score="3">Uttarakhand</option>
+          <option value="West Bengal" data-score="4">West Bengal</option>
+          <option value="Andaman and Nicobar Islands" data-score="2">Andaman and Nicobar Islands</option>
+          <option value="Chandigarh" data-score="5">Chandigarh</option>
+          <option value="Dadra and Nagar Haveli and Daman and Diu" data-score="3">Dadra and Nagar Haveli and Daman and Diu</option>
+          <option value="Delhi" data-score="5">Delhi</option>
+          <option value="Jammu and Kashmir" data-score="2">Jammu and Kashmir</option>
+          <option value="Ladakh" data-score="2">Ladakh</option>
+          <option value="Lakshadweep" data-score="2">Lakshadweep</option>
+          <option value="Puducherry" data-score="4">Puducherry</option>
+        </select>
+        
         </select>
       </div>
 
       <div class="navigation">
         <button class="nav-button back-button" onclick="goBack()">&#60;- Back</button>
-        <button class="nav-button next-button" onclick="goNext()">Next -&gt;</button>
+        <button class="nav-button next-button" onclick="goNext()">Next ➝</button>
       </div>
     </div>
   </div>
 
+
   <script>
-    function goNext() {
-      const country = document.getElementById("country").value;
-      if (country) {
-        // Send response to the backend
-        fetch('/store_quiz_response', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            question_id: 'mental1',          // Unique ID for the question
-            selected_option: country,        // Selected answer
-            quiz_category: 'mental_health'   // Category for mental health
-          })
+     function goNext() {
+    const countrySelect = document.getElementById("country");
+    const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+    const country = selectedOption.value;
+    const score = selectedOption.getAttribute("data-score") || 0;  // Default score if missing
+
+    if (country) {
+      // ✅ Send response to the backend
+      fetch('/store_quiz_response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_id: 'mental1',          // Unique ID for the question
+          selected_option: country,        // Selected state
+          score: parseInt(score),          // Assigned score
+          quiz_category: 'mental_health'   // Category for mental health
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message) {
-            console.log("Response saved successfully!");
-            window.location.href = '/mental2';  // Go to the next question
-          } else {
-            alert("Failed to save response. Please try again.");
-          }
-        })
-        .catch(error => console.error('Error:', error));
-      } else {
-        alert("Please select a country before proceeding.");
-      }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          console.log("✅ Response saved successfully!");
+          window.location.href = '/mental2';  // ✅ Navigate to the next question
+        } else {
+          alert("❌ Failed to save response. Please try again.");
+        }
+      })
+      .catch(error => console.error('❌ Error:', error));
+    } else {
+      alert("❌ Please select a state before proceeding.");
     }
+  }
   
     function goBack() {
-      window.location.href = '/options';  // Change this to the actual previous page URL
+      window.location.href = '/mentalhome';  // Change this to the actual previous page URL
     }
   
     function goToHome() {
-      window.location.href = '/';  // Change this to your homepage URL
+      window.location.href = '/mentalhome';  // Change this to your homepage URL
     }
   </script>  
 </body>

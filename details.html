@@ -269,23 +269,18 @@
         <div class="form-section">
             <h3>Enter Details</h3>
             <form id="bookingForm">
-                <label for="firstName">First Name *</label>
+                <label for="firstName">Full Name *</label>
                 <input type="text" id="firstName" required>
-
-                <label for="lastName">Last Name *</label>
-                <input type="text" id="lastName" required>
-
+            
                 <label for="email">Email *</label>
                 <input type="email" id="email" required>
-
-                <label for="whatsapp">WhatsApp Number *</label>
-                <div class="phone-input">
-                    <span class="flag">🇮🇳</span>
-                    <input type="tel" id="whatsapp" required>
-                </div>
-
-                <button type="submit" class="schedule-btn">Schedule Event</button>
+            
+                <label for="phone">Phone *</label>
+                <input type="tel" id="phone" required>
+            
+                <button type="submit" class="schedule-btn">Proceed to Payment</button>
             </form>
+            
         </div>
 
         <!-- Confirmation Popup -->
@@ -305,26 +300,59 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-        let storedDate = localStorage.getItem("selectedDate");
-        let storedTime = localStorage.getItem("selectedTime");
 
-        if (storedDate && storedTime) {
-            document.getElementById("session-date").textContent = storedDate;
-            document.getElementById("session-time").textContent = storedTime;
-        }
-    });
+document.addEventListener("DOMContentLoaded", function() {
+    // Ensure localStorage values exist before setting them
+    let storedName = localStorage.getItem("userName");
+    let storedEmail = localStorage.getItem("userEmail");
 
-    document.getElementById("bookingForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent actual form submission
+    if (storedName) {
+        document.getElementById("firstName").value = storedName;
+        document.getElementById("firstName").setAttribute("readonly", true); // Prevent editing
+    }
 
-    // Show confirmation popup
-    document.getElementById("confirmationPopup").style.display = "flex";
+    if (storedEmail) {
+        document.getElementById("email").value = storedEmail;
+        document.getElementById("email").setAttribute("readonly", true); // Prevent editing
+    }
 
-    // Redirect after 3 seconds
-    setTimeout(function() {
-        window.location.href = '/mentalpayment'; 
-    }, 3000);
+    // Load session details (date and time)
+    let storedDate = localStorage.getItem("selectedDate") || "Not Selected";
+    let storedTime = localStorage.getItem("selectedTime") || "Not Selected";
+
+    document.getElementById("session-date").textContent = storedDate;
+    document.getElementById("session-time").textContent = storedTime;
+});
+
+// Handle form submission
+document.addEventListener("DOMContentLoaded", function () {
+    let bookingForm = document.getElementById("bookingForm");
+
+    if (bookingForm) {
+        bookingForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent actual form submission
+
+            let phoneNumber = document.getElementById("phone").value;
+            if (!phoneNumber.trim()) {
+                alert("Please enter your phone number.");
+                return;
+            }
+
+            // Store phone number in localStorage
+            localStorage.setItem("userPhone", phoneNumber);
+
+            // Show confirmation popup
+            let confirmationPopup = document.getElementById("confirmationPopup");
+            if (confirmationPopup) {
+                confirmationPopup.style.display = "flex";
+            }
+
+            // Redirect after 3 seconds
+            setTimeout(function () {
+                window.location.href = '/mentalpayment';
+            }, 3000);
+        });
+    }
 });
 
 function goBack() {
