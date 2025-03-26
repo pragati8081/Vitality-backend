@@ -222,25 +222,14 @@
 
   <div class="container">
     <div class="image-section">
-      <img src="{{ url_for('static', filename='images/beauty_jewelry_portfolio.jpeg') }}" alt="Placeholder Image">
+        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\Made For All Bodies Through Sustainability And Clean Products, Meet FEHH.jpeg" alt="Placeholder Image">
     </div>
     <div class="content-section">
-      <div class="question">6. Do you have any medical conditions?</div>
+      <div class="question">6. Would you like to improve your focus and mental clarity?</div>
       <div class="options">
         <button class="option-1" onclick="selectOption(1)">No</button>
-        <button class="option-2" onclick="selectOption(2)">PCOS/PCOD</button>
-        <button class="option-3" onclick="selectOption(3)">Thyroid Disorder</button>
-        <button class="option-4" onclick="selectOption(4)">Diabetes</button>
-        <button class="option-5" onclick="selectOption(5)">Other (Please specify)</button>
-
-        <div id="other-input-container" style="display: none; margin-top: 10px;">
-          <input type="text" id="other-input" placeholder="Type here..." 
-                 style="padding: 8px; width: 200px; border-radius: 5px; border: 1px solid #ccc;">
-          <button onclick="submitOther()" 
-                  style="padding: 8px 15px; margin-left: 10px; background-color: #A91E43; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              OK
-          </button>
-      </div>
+        <button class="option-2" onclick="selectOption(2)">Yes</button>
+        
       </div>
       <div class="navigation">
         <button onclick="goBack()">BACK</button>
@@ -251,13 +240,13 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+      console.log(Option ${optionNumber} selected);
+      alert(You selected Option ${optionNumber});
         let response = {
             question_id: "Q6",
             selected_option: optionNumber,
             quiz_category: "Physical Health",
-            level: "Basic"
+            level: "Goals"
         };
 
         console.log("Option Selected:", response);  // ✅ Debugging log
@@ -276,30 +265,14 @@
     }
 
     function goBack() {
-        window.location.href = '/basicQ5';
+        window.location.href = '/goalsQ5';
     }
 
     function goNext() {
-        window.location.href = '/basicQ7';
+        window.location.href = '/goalsQ7';
     }
     function goToHome() {
       window.location.href = '/physicalhome'; // Change to actual homepage URL
-    }
-    function selectOption(optionNumber) {
-        if (optionNumber === 5) {
-            document.getElementById("other-input-container").style.display = "flex";
-        } else {
-            document.getElementById("other-input-container").style.display = "none";
-        }
-    }
-
-    function submitOther() {
-        let allergyInput = document.getElementById("other-input").value;
-        if (allergyInput.trim() !== "") {
-            alert("You specified: " + allergyInput);
-        } else {
-            alert("Please enter a value.");
-        }
     }
   </script>
 </body>
