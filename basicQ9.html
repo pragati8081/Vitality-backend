@@ -63,7 +63,7 @@
     }
 
     .logo {
-      height: 40px; /* Adjust as needed */
+      height: 40px;
     }
 
     .container {
@@ -109,7 +109,7 @@
       align-items: center;
     }
 
-    .option-1 {
+    .option-button {
       background: #A91E43;
       border: 2px solid #A91E43;
       color: white;
@@ -119,67 +119,11 @@
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: center;
-      padding: 0.75rem 2rem; /* Increase padding for larger buttons */
-      min-width: 200px; /* Set a minimum width */
+      padding: 0.75rem 2rem;
+      min-width: 200px;
     }
 
-    .option-2 {
-      background: #B71F47;
-      border: 2px solid #B71F47;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      min-width: 200px; /* Set a minimum width */
-    }
-
-    .option-3 {
-      background: #CA2C56;
-      border: 2px solid #CA2C56;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      min-width: 200px; /* Set a minimum width */
-    }
-
-    .option-4 {
-      background: #D3496E;
-      border: 2px solid #D3496E;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      min-width: 200px; /* Set a minimum width */
-    }
-
-    .option-5 {
-      background: #e9688b;
-      border: 2px solid #e9688b;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-align: center;
-      min-width: 200px; 
-    }
-    
-    .options button:hover {
+    .option-button:hover {
       background: rgba(255, 255, 255, 0.4);
       color: #000;
       transform: scale(1.05);
@@ -227,11 +171,11 @@
     <div class="content-section">
       <div class="question">9. Do you have any dietary restrictions?</div>
       <div class="options">
-        <button class="option-1" onclick="selectOption(1)">Vegetarian</button>
-        <button class="option-2" onclick="selectOption(2)">Vegan</button>
-        <button class="option-3" onclick="selectOption(3)">Gluten-Free</button>
-        <button class="option-4" onclick="selectOption(4)">Dairy-Free</button>
-        <button class="option-5" onclick="selectOption(5)">No Restrictions</button>
+        <button class="option-button" onclick="selectOption('Vegetarian')">Vegetarian</button>
+        <button class="option-button" onclick="selectOption('Vegan')">Vegan</button>
+        <button class="option-button" onclick="selectOption('Gluten-Free')">Gluten-Free</button>
+        <button class="option-button" onclick="selectOption('Dairy-Free')">Dairy-Free</button>
+        <button class="option-button" onclick="selectOption('No Restrictions')">No Restrictions</button>
       </div>
       <div class="navigation">
         <button onclick="goBack()">BACK</button>
@@ -241,29 +185,27 @@
   </div>
 
   <script>
-    function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
-        let response = {
-            question_id: "Q9",
-            selected_option: optionNumber,
-            quiz_category: "Physical Health",
-            level: "Basic"
-        };
+    function selectOption(optionText) {
+      console.log(`Selected Option: ${optionText}`);
 
-        console.log("Option Selected:", response);  // ✅ Debugging log
+      let response = {
+          question_id: "Q9",
+          selected_option: optionText,
+          quiz_category: "Physical Health",
+          level: "Basic"
+      };
 
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response)
-        })
-        .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
-            return response.json();
-        })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+      fetch("http://127.0.0.1:5000/store_quiz_response", {  
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response)
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log("Response saved:", data);
+          alert(`You selected: ${optionText}`);
+      })
+      .catch(error => console.error("Error:", error));
     }
 
     function goBack() {
@@ -273,8 +215,9 @@
     function goNext() {
         window.location.href = '/basicQ10';
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+      window.location.href = '/physicalhome';
     }
   </script>
 </body>
