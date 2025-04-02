@@ -244,7 +244,7 @@
     <!-- Header -->
   <header class="header">
     <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+    <img src="images/vitality_logo.jpeg" alt="Vitality Logo" class="logo">
     <h1>Vitality</h1>
   </header>
 
@@ -255,7 +255,7 @@
 
         <!-- Left Section: Session Info -->
         <div class="session-details">
-            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Rocket Health">
+            <img src="images/vitality_logo.jpeg" alt="Rocket Health">
             <h2>1:1 Therapy Session (60 minutes)</h2>
             <p>Personalized therapy session with a matched therapist.</p>
             <div class="session-info">
@@ -269,91 +269,129 @@
         <div class="form-section">
             <h3>Enter Details</h3>
             <form id="bookingForm">
-                <label for="firstName">Full Name *</label>
+                <label for="firstName">First Name *</label>
                 <input type="text" id="firstName" required>
-            
+
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" required>
+
                 <label for="email">Email *</label>
                 <input type="email" id="email" required>
-            
-                <label for="phone">Phone *</label>
-                <input type="tel" id="phone" required>
-            
-                <button type="submit" class="schedule-btn">Proceed to Payment</button>
+
+                <label for="whatsapp">WhatsApp Number *</label>
+                <div class="phone-input">
+                    <span class="flag">🇮🇳</span>
+                    <input type="tel" id="whatsapp" required>
+                </div>
+
+                <button type="submit" class="schedule-btn">Schedule Event</button>
             </form>
-            
         </div>
 
         <!-- Confirmation Popup -->
-<div id="confirmationPopup" class="popup-container">
-    <div class="popup-content">
-        <div class="check-icon">✔</div>
-        <h2>Confirmed</h2>
-        <br>
-        <br>
-        <p>You are scheduled with Shabrina Ashraf.</p>
-        <br>
-        <br>
-        <p>Redirecting...</p>
-    </div>
-</div>
+        <div id="confirmationPopup" class="popup-container">
+            <div class="popup-content">
+                <div class="check-icon">✔</div>
+                <h2>Confirmed</h2>
+                <br>
+                <br>
+                <p id="therapist-name-text">Your appointment is booked with <strong></strong>.</p>
+                <br>
+                <br>
+                <p>Redirecting...</p>
+            </div>
+        </div>
+        
 
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    let storedDate = localStorage.getItem("selectedDate");
+    let storedTime = localStorage.getItem("selectedTime");
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Ensure localStorage values exist before setting them
-    let storedName = localStorage.getItem("userName");
-    let storedEmail = localStorage.getItem("userEmail");
-
-    if (storedName) {
-        document.getElementById("firstName").value = storedName;
-        document.getElementById("firstName").setAttribute("readonly", true); // Prevent editing
+    if (storedDate && storedTime) {
+        document.getElementById("session-date").textContent = storedDate;
+        document.getElementById("session-time").textContent = storedTime;
     }
 
-    if (storedEmail) {
-        document.getElementById("email").value = storedEmail;
-        document.getElementById("email").setAttribute("readonly", true); // Prevent editing
+    fetch("/get_therapist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ time: storedTime }) // Send the selected time
+})
+.then(response => response.json())
+.then(data => {
+    if (data.error) {
+        alert("⚠️ No therapist available at this time.");
+    } else {
+        console.log("✅ Therapist Found:", data);
+        
+        // ✅ Store therapist details in localStorage
+        localStorage.setItem("therapistName", data.name);
+        localStorage.setItem("therapistFee", data.fees.amount);  // Store fee for later use
+
+        // ✅ Update Confirmation Popup
+        document.getElementById("therapist-name").textContent = data.name;
     }
+})
+.catch(error => console.error("❌ Error fetching therapist:", error));
 
-    // Load session details (date and time)
-    let storedDate = localStorage.getItem("selectedDate") || "Not Selected";
-    let storedTime = localStorage.getItem("selectedTime") || "Not Selected";
+    
+    // Fetch logged-in user details
+    fetch("/get_user_details")
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("⚠️ " + data.error); // Show error
+            } else {
+                console.log("✅ User Data:", data); // Debugging log
 
-    document.getElementById("session-date").textContent = storedDate;
-    document.getElementById("session-time").textContent = storedTime;
+                // Ensure name is set correctly
+                let fullName = data.name || "User";
+                let nameParts = fullName.split(" ");
+                document.getElementById("firstName").value = nameParts[0] || "";
+                document.getElementById("lastName").value = nameParts.slice(1).join(" ") || "";
+                document.getElementById("email").value = data.email || "";
+
+                // Disable editing for name and email
+                document.getElementById("firstName").setAttribute("readonly", true);
+                document.getElementById("lastName").setAttribute("readonly", true);
+                document.getElementById("email").setAttribute("readonly", true);
+            }
+        })
+        .catch(error => console.error("❌ Error fetching user details:", error));
 });
 
-// Handle form submission
-document.addEventListener("DOMContentLoaded", function () {
-    let bookingForm = document.getElementById("bookingForm");
+// Handle form submission and log details
+document.getElementById("bookingForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent actual form submission
 
-    if (bookingForm) {
-        bookingForm.addEventListener("submit", function (event) {
-            event.preventDefault(); // Prevent actual form submission
+    let therapistName = localStorage.getItem("therapistName") || "a therapist"; // Get therapist name
 
-            let phoneNumber = document.getElementById("phone").value;
-            if (!phoneNumber.trim()) {
-                alert("Please enter your phone number.");
-                return;
-            }
+    let userData = {
+        name: document.getElementById("firstName").value + " " + document.getElementById("lastName").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("whatsapp").value,
+        sessionDate: document.getElementById("session-date").textContent,
+        sessionTime: document.getElementById("session-time").textContent,
+        therapist: therapistName
+    };
 
-            // Store phone number in localStorage
-            localStorage.setItem("userPhone", phoneNumber);
+    console.log("📌 Booking Details:", userData); // Debugging log
 
-            // Show confirmation popup
-            let confirmationPopup = document.getElementById("confirmationPopup");
-            if (confirmationPopup) {
-                confirmationPopup.style.display = "flex";
-            }
+    // ✅ Update the confirmation popup dynamically
+    document.getElementById("therapist-name-text").innerHTML = `Your appointment is booked with <strong>${therapistName}</strong>.`;
 
-            // Redirect after 3 seconds
-            setTimeout(function () {
-                window.location.href = '/mentalpayment';
-            }, 3000);
-        });
-    }
+    // ✅ Show confirmation popup
+    document.getElementById("confirmationPopup").style.display = "flex";
+
+    // ✅ Redirect after 3 seconds
+    setTimeout(function () {
+        window.location.href = "/mentalpayment"; // Change to actual payment page URL
+    }, 3000);
 });
+
 
 function goBack() {
     window.history.back();

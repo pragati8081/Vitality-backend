@@ -693,7 +693,7 @@ nav ul li a:hover {
 
     <div class="why-choose-us">
         <div class="content">
-            <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality frontend\_abd36bcd-b3c1-4b47-957c-e43b9da1f2be.jpeg" alt="What we do icon" class="icon">
+            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}"alt="What we do icon" class="icon">
             <div class="text">
                 <h2>Why Choose Us?</h2>
                 <p>At Vitality, we prioritize your health by providing tailored wellness plans, expert guidance, and ongoing support to help you achieve your fitness and mental well-being goals. 
@@ -790,7 +790,7 @@ nav ul li a:hover {
     <div class="container">
         <div class="section get-in-touch">
           <h2>GET IN TOUCH WITH US</h2>
-          <img src="https://i.imgur.com/MlWRisI.jpeg" alt="Hands making a heart">
+          <img src="{{ url_for('static', filename='images/xyz.jpeg') }}" alt="Hands making a heart">
           <div class="social-buttons">
             <button onclick="window.open('https://instagram.com', '_blank')">Instagram</button>
             <button onclick="window.open('https://whatsapp.com', '_blank')">WhatsApp</button>

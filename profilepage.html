@@ -222,7 +222,7 @@
                 <button class="active" onclick="showSection('profile')">Profile</button>
                 <button onclick="showSection('password')">Password</button>
                 <button onclick="showSection('orders')">Orders</button>
-                <button onclick="showSection('therapy')">Therapy</button>
+                <button onclick="showTherapyAppointments()">Therapy</button>
                 <button onclick="logoutUser('Logout')">Logout</button>
 
             </div>
@@ -259,9 +259,7 @@ function fetchProfile() {
                 alert("Error: " + data.error);
                 window.location.href = "/login"; 
             } else {
-                // Combine first_name and last_name if they exist
-                let fullName = (data.first_name || "") + " " + (data.last_name || "");
-                document.getElementById("name").value = fullName.trim(); // Set full name
+                document.getElementById("name").value = data.name || "";
                 document.getElementById("username").value = data.username || "";
                 document.getElementById("email").value = data.email || "";
                 document.getElementById("address").value = data.address || "";
@@ -279,16 +277,20 @@ function fetchProfile() {
 
         }
         function saveProfile() {
+    let fullName = document.getElementById("name").value.trim().split(" ");
+    let firstName = fullName[0] || "";
+    let lastName = fullName.length > 1 ? fullName.slice(1).join(" ") : "";
+
     const profileData = {
+        first_name: firstName,
+        last_name: lastName,
         username: document.getElementById("username").value.trim(),
+        email: document.getElementById("email").value.trim(),
         address: document.getElementById("address").value.trim(),
         phone: document.getElementById("phone").value.trim()
     };
 
-    if (!profileData.username || !profileData.address || !profileData.phone) {
-        alert("All fields are required.");
-        return;
-    }
+    console.log("Sending profile update:", profileData);  // ✅ Debugging log
 
     fetch('/save_profile', {
         method: "POST",
@@ -297,6 +299,7 @@ function fetchProfile() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log("Server response:", data);  // ✅ Debugging log
         alert(data.message);
     })
     .catch(error => console.error("Error updating profile:", error));
@@ -310,46 +313,34 @@ function showSection(section) {
             <h2>PROFILE</h2>
             <div class="form-group"><label>Name</label><input type="text" id="name"></div>
             <div class="form-group"><label>Username</label><input type="text" id="username"></div>
-            <div class="form-group"><label>Email</label><input type="email" id="email" disabled></div>
+            <div class="form-group"><label>Email</label><input type="email" id="email"></div>
             <div class="form-group"><label>Address</label><input type="text" id="address"></div>
             <div class="form-group"><label>Phone Number</label><input type="text" id="phone"></div>
             <div class="buttons"><button class="save-btn" onclick="saveProfile()">Save</button></div>
         `,
         password: `
             <h2>CHANGE PASSWORD</h2>
-            <form id="passwordForm">
+            <form id="passwordForm" onsubmit="event.preventDefault(); updatePassword();">
                 <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
                 <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required></div>
                 <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmNewPassword" required></div>
                 <div class="buttons"><button type="submit" class="save-btn">Update Password</button></div>
-           </form>
-        `,
-        therapy: `
-            <h2>THERAPY DETAILS</h2>
-            <div id="therapy-info" class="info-box">Fetching therapist details...</div>
-        `
+            </form>
+            `,
+        orders: `<h2>ORDERS</h2><div class="info-box">Your order history will be visible here.</div>`,
+        therapy: `<h2>THERAPY</h2><div class="info-box">Your therapy sessions and progress will be visible here.</div>`
     };
-
+    
+    // Update the content section
     document.getElementById("content-area").innerHTML = content[section];
 
-    if (section === "password") {
-        setTimeout(() => {
-            document.getElementById("passwordForm").addEventListener("submit", function (event) {
-                event.preventDefault();
-                updatePassword();
-            });
-        }, 100);
-    } else if (section === "therapy") {
-        fetchTherapistDetails(); // Fetch therapist details
-    } else {
-        fetchProfile();
-    }
+if (section === "password") {
+    document.getElementById("passwordForm").addEventListener("submit", updatePassword);
+}
 
     document.querySelectorAll(".menu button").forEach(button => button.classList.remove("active"));
     document.querySelector(`.menu button[onclick="showSection('${section}')"]`).classList.add("active");
 }
-
-
 function updatePassword() {
     const currentPassword = document.getElementById("currentPassword").value.trim();
     const newPassword = document.getElementById("newPassword").value.trim();
@@ -368,9 +359,9 @@ function updatePassword() {
     fetch('/update_password', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            current_password: currentPassword,
-            password: newPassword
+        body: JSON.stringify({ 
+            current_password: currentPassword, 
+            new_password: newPassword 
         })
     })
     .then(response => response.json())
@@ -380,29 +371,63 @@ function updatePassword() {
             document.getElementById("currentPassword").value = "";
             document.getElementById("newPassword").value = "";
             document.getElementById("confirmNewPassword").value = "";
+            window.location.href = '/profilepage'; // Reload profile page
         }
     })
     .catch(error => console.error("Error updating password:", error));
 }
-function fetchTherapistDetails() {
-    fetch('/get_therapist_details')
+
+function showTherapyAppointments() {
+    fetch('/get_appointments')
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                document.getElementById("therapy-info").innerHTML = `<p style="color: red;">${data.error}</p>`;
-            } else {
-                document.getElementById("therapy-info").innerHTML = `
-                    <p><strong>Therapist Name:</strong> ${data.therapist_name}</p>
-                    <p><strong>Specialization:</strong> ${data.specialization}</p>
-                    <p><strong>Appointment Date:</strong> ${data.date}</p>
-                    <p><strong>Time:</strong> ${data.time}</p>
-                    <p><strong>Fee Paid:</strong> ₹${data.amount_paid}</p>
-                `;
+            console.log("Fetched Data:", data);  // ✅ Debugging ke liye
+
+            if (!data.length) {
+                document.getElementById("content-area").innerHTML = `<h3>No Appointments Found</h3>`;
+                return;
             }
+
+            let tableContent = `
+                <div class="therapy-container">
+                    <h2 class="title">Booked Therapy Appointments</h2>
+                    <table class="therapy-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Therapist Name</th>
+                                <th>Appointment Date</th>
+                                <th>Time Slot</th>
+                                <th>Amount (₹)</th>
+                                <th>Payment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(appointment => {
+                console.log("Checking Appointment:", appointment);  // ✅ Debugging
+
+                tableContent += `
+                    <tr>
+                        <td>${appointment.user_name || appointment.username || "N/A"}</td>  
+                        <td>${appointment.therapist || appointment.therapist_name || "N/A"}</td>  
+                        <td>${appointment.session_date || appointment.date || "N/A"}</td>  
+                        <td>${appointment.session_time || appointment.time || "N/A"}</td>  
+                        <td>₹${appointment.amount || "0"}</td>
+                        <td style="color: ${appointment.payment_status === 'Pending' ? 'red' : 'green'}; font-weight: bold;">
+                            ${appointment.payment_status || "N/A"}
+                        </td>
+                    </tr>`;
+            });
+
+            tableContent += `</tbody></table></div>`;
+
+            document.getElementById("content-area").innerHTML = tableContent;
         })
         .catch(error => {
-            console.error("Error fetching therapist details:", error);
-            document.getElementById("therapy-info").innerHTML = `<p style="color: red;">Failed to load therapist details.</p>`;
+            console.error("Error fetching therapy appointments:", error);
+            document.getElementById("content-area").innerHTML = `<h3 style="color:red;">Error Loading Appointments</h3>`;
         });
 }
 

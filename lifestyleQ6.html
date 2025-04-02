@@ -222,7 +222,7 @@
 
   <div class="container">
     <div class="image-section">
-        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\download (3).jpeg" alt="Placeholder Image">
+      <img src="{{ url_for('static', filename='images/download_3.jpeg') }}" alt="Placeholder Image">
     </div>
     <div class="content-section">
       <div class="question">6. How much water do you drink daily?</div>
@@ -230,8 +230,8 @@
         <button class="option-1" onclick="selectOption(1)">Less than 1L</button>
         <button class="option-2" onclick="selectOption(2)">1-2L</button>
         <button class="option-3" onclick="selectOption(3)">2-3L</button>
-        <button class="option-4" onclick="selectOption(4)">36-50</button>
-        <button class="option-5" onclick="selectOption(5)">More than 3L</button>
+        <button class="option-4" onclick="selectOption(4)">3-5L</button>
+        <button class="option-5" onclick="selectOption(5)">More than 5L</button>
       </div>
       <div class="navigation">
         <button onclick="goBack()">BACK</button>

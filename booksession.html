@@ -252,7 +252,7 @@
     <!-- Header -->
   <header class="header">
     <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+    <img src="images/vitality_logo.jpeg" alt="Vitality Logo" class="logo">
     <h1>Vitality</h1>
   </header>
 
@@ -261,7 +261,7 @@
     <div class="booking-container">
         <!-- Left Side: Session Info -->
         <div class="session-info">
-            <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Health">
+            <img src="images/vitality_logo.jpeg" alt="Vitality Health">
             <h3>1:1 Therapy Session (60 minutes)</h3>
             <p>Our software matches you to the most compatible psychologist according to your needs.</p>
             <div class="duration">
@@ -290,6 +290,11 @@
     </div>
 
     <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    updateCalendar();
+});
+
         let currentDate = new Date();
         let selectedDate = null;
 
@@ -359,15 +364,55 @@
         updateCalendar();
 
         document.getElementById("submitButton").addEventListener("click", function() {
-    let selectedTherapist = "Dr. John Doe"; // Example, replace with actual selection
-    let selectedDate = document.querySelector(".calendar div.selected").textContent;
-    let selectedTime = document.querySelector(".time-slot.selected-slot").textContent;
+            let selectedDay = document.querySelector(".calendar div.selected")?.textContent;
+if (!selectedDay) {
+    alert("Please select a date.");
+    return;
+}
 
-    localStorage.setItem("selectedTherapist", selectedTherapist);
-    localStorage.setItem("selectedDate", selectedDate);
-    localStorage.setItem("selectedTime", selectedTime);
+    let year = currentDate.getFullYear();
+    let month = ("0" + (currentDate.getMonth() + 1)).slice(-2); // Ensure two digits
+    let day = ("0" + selectedDay).slice(-2);
+    let formattedDate = `${year}-${month}-${day}`;
+    let selectedTime = document.querySelector(".time-slot.selected-slot")?.textContent;
+    if (!selectedTime) {
+    alert("Please select a time slot.");
+    return;
+    }
 
-    window.location.href = "/details"; // Redirect to details page
+    if (!selectedDate || !selectedTime) {
+        alert("Please select a date and time.");
+        return;
+    }
+
+    let requestData = { date: formattedDate, time: selectedTime };
+    console.log("Sending request:", requestData);  // Debugging log
+
+    fetch("/get_therapist", {
+        method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ date: formattedDate, time: selectedTime })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.error) {
+        console.error("❌ Error fetching therapist:", data.error);
+        alert("No therapist available at this time.");
+    } else {
+        console.log("✅ Assigned Therapist:", data);
+
+        // ✅ Store therapist details in localStorage
+        localStorage.setItem("therapistName", data.name);
+        localStorage.setItem("therapistFee", data.fees.amount);
+        localStorage.setItem("selectedDate", formattedDate);
+        localStorage.setItem("selectedTime", selectedTime);
+
+
+            // Redirect to details page
+            window.location.href = "/details";
+        }
+    })
+    .catch(error => console.error("❌ Error:", error));
 });
 
 
@@ -387,11 +432,9 @@ document.getElementById("bookingForm").addEventListener("submit", function(event
         localStorage.setItem("selectedTime", selectedTime);
 
         // Redirect to the second page
-        window.location.href = "details.html"; // Change to actual second page URL
+        window.location.href = '/details'; // Change to actual second page URL
     });
-
-
-    </script>
+</script>
 
 </body>
 </html>

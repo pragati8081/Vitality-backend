@@ -165,6 +165,20 @@
       min-width: 200px; /* Set a minimum width */
     }
 
+    .option-5 {
+      background: #e9688b;
+      border: 2px solid #e9688b;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      min-width: 200px; 
+    }
+    
     .options button:hover {
       background: rgba(255, 255, 255, 0.4);
       color: #000;
@@ -211,18 +225,13 @@
       <img src="{{ url_for('static', filename='images/beauty_jewelry_portfolio.jpeg') }}" alt="Placeholder Image">
     </div>
     <div class="content-section">
-      <div class="question">7. Are you currently taking any medications or supplements?</div>
+      <div class="question">9. Do you have any dietary restrictions?</div>
       <div class="options">
-        <button class="option-1" onclick="selectOption(1)">No</button>
-        <button class="option-2" onclick="selectOption(2)">Yes (Please specify)</button>
-        <div id="other-input-container" style="display: none; margin-top: 10px;">
-          <input type="text" id="other-input" placeholder="Type here..." 
-                 style="padding: 8px; width: 200px; border-radius: 5px; border: 1px solid #ccc;">
-          <button onclick="submitOther()" 
-                  style="padding: 8px 15px; margin-left: 10px; background-color: #A91E43; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              OK
-          </button>
-      </div>
+        <button class="option-1" onclick="selectOption(1)">Vegetarian</button>
+        <button class="option-2" onclick="selectOption(2)">Vegan</button>
+        <button class="option-3" onclick="selectOption(3)">Gluten-Free</button>
+        <button class="option-4" onclick="selectOption(4)">Dairy-Free</button>
+        <button class="option-5" onclick="selectOption(5)">No Restrictions</button>
       </div>
       <div class="navigation">
         <button onclick="goBack()">BACK</button>
@@ -236,7 +245,7 @@
       console.log(`Option ${optionNumber} selected`);
       alert(`You selected Option ${optionNumber}`);
         let response = {
-            question_id: "Q7",
+            question_id: "Q9",
             selected_option: optionNumber,
             quiz_category: "Physical Health",
             level: "Basic"
@@ -258,32 +267,14 @@
     }
 
     function goBack() {
-        window.location.href = '/basicQ6';
-    }
-
-    function goNext() {
         window.location.href = '/basicQ8';
     }
 
+    function goNext() {
+        window.location.href = '/basicQ10';
+    }
     function goToHome() {
       window.location.href = '/physicalhome'; // Change to actual homepage URL
-    }
-
-    function selectOption(optionNumber) {
-        if (optionNumber === 2) {
-            document.getElementById("other-input-container").style.display = "flex";
-        } else {
-            document.getElementById("other-input-container").style.display = "none";
-        }
-    }
-
-    function submitOther() {
-        let allergyInput = document.getElementById("other-input").value;
-        if (allergyInput.trim() !== "") {
-            alert("You specified: " + allergyInput);
-        } else {
-            alert("Please enter a value.");
-        }
     }
   </script>
 </body>

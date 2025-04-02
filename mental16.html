@@ -181,9 +181,10 @@
         <p class="questions-title">What was your sex assigned at birth?</p>
         <br>
         <select id="country" class="country-dropdown">
-          <option value="A: Male">Male</option>
-          <option value="B: Female">Female</option>
-          <option value="C: Transgender">Transgender</option>
+          lect id="country" class="country-dropdown">
+        <option value="A: Male,0">Male</option>
+        <option value="B: Female,0">Female</option>
+        <option value="C: Transgender,0">Transgender</option>
         </select>
       </div>
 
@@ -201,13 +202,14 @@
           alert("❌ Please select an option before proceeding.");
           return;
       }
-  
+      let [optionText, score] = selectedOption.split(","); // Extract text and score
       fetch('/store_quiz_response', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
               question_id: 'mental16',
               selected_option: selectedOption,
+              score: parseInt(score), // Convert score to integer
               quiz_category: 'mental_health'
           })
       })

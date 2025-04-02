@@ -150,9 +150,9 @@
 
     <!-- Header Section -->
     <div class="header">
-        <a href="/" class="button">Back to Homepage</a>
-        <div class="site-title">Vitality</div>
-        <a href="/vitalitycheckout" class="button">Next</a>
+        <a href='/physicalhome' class="button">Back to Homepage</a>
+        <div class="site-title">Vitality.com</div>
+        <a href='/vitalitycheckout' class="button">Next</a>
     </div>
 
     <!-- Recommendation Title -->
@@ -166,31 +166,28 @@
     <!-- Recommendation Cards -->
     <div class="card-container">
         <div class="card">
-            <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\_6fc86818-7e7a-4e71-9743-5a6872c294ca.jpeg" alt="Recommendation Image">
+            <img src="{{ url_for('static', filename='images/pill1.jpeg') }}" alt="Recommendation Image">
             <div class="card-content">
-                <p>Recommendation 1</p>
-                <p>Description here.</p>
+                <p>Liveasy Wellness Multivitamin Multimineral</p>
             </div>
         </div>
         <div class="card">
-            <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\_b5221579-456c-4195-af13-3ecc82426286.jpeg" alt="Recommendation Image">
+            <img src="{{ url_for('static', filename='images/pill2.jpeg') }}" alt="Recommendation Image">
             <div class="card-content">
-                <p>Recommendation 2</p>
-                <p>Description here.</p>
+                <p>Iron Supplement</p>
             </div>
         </div>
         <div class="card">
-            <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\_4a032c23-eb55-450d-97d7-2b54e6c72515.jpeg" alt="Recommendation Image">
+            <img src="{{ url_for('static', filename='images/pill3.jpeg') }}" alt="Recommendation Image">
             <div class="card-content">
-                <p>Recommendation 3</p>
-                <p>Description here.</p>
+                <p>Zincovit Tablet</p>
+                
             </div>
         </div>
         <div class="card">
-            <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\_bb0c8057-f9ae-4340-9c85-77cf993d65c6.jpeg" alt="Recommendation Image">
+            <img src="{{ url_for('static', filename='images/pill4.jpeg') }}" alt="Recommendation Image">
             <div class="card-content">
-                <p>Recommendation 4</p>
-                <p>Description here.</p>
+                <p>MuscleTech Platinum Multivitamin</p>
             </div>
         </div>
     </div>

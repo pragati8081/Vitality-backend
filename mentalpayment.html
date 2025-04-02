@@ -203,7 +203,7 @@
     <!-- Header -->
   <header class="header">
     <button class="home-button" onclick="goToHome()">Home</button>
-    <img src="{{ url_for('static', filename='images/vitality_logo.jpeg') }}" alt="Vitality Logo" class="logo">
+    <img src="images/vitality_logo.jpeg" alt="Vitality Logo" class="logo">
     <h1>Vitality</h1>
   </header>
 
@@ -232,73 +232,138 @@
         </div>
 
         <div class="payment-form">
-            <h2>Payment Details</h2>
-            <label>Amount</label>
-            <input type="text" id="amount" value="₹899.00" readonly>
+    <h2>Payment Details</h2>
 
-            <label>Full Name</label>
-<input type="text" id="fullName" readonly>
+    <label>Amount</label>
+    <input type="text" id="amount" value="₹899.00" readonly>
 
-<label>Email*</label>
-<input type="email" id="email" readonly>
+    <label>Full Name</label>
+    <input type="text" id="fullName" value="Loading..." readonly>
 
-<label>Phone *</label>
-<div class="phone-input">
-    <select>
-        <option value="+91">🇮🇳 +91</option>
-    </select>
-    <input type="text" id="phone" readonly>
-</div>
+    <label>Email*</label>
+    <input type="email" id="email" value="Loading..." readonly>
 
-<button id="pay-btn" onclick="confirmPayment()">Pay ₹899.00</button>
-            <label>Referral / Discount Code</label>
-            <div class="discount-code">
-                <input type="text" id="discount" placeholder="Enter code">
-                <button onclick="applyDiscount()">Apply</button>
-            </div>
-
-            <button id="pay-btn" onclick="confirmPayment()">Pay ₹899.00</button>
-            <p class="secure">🔒 Payments are secure and encrypted</p>
-        </div>
+    <label>Phone *</label>
+    <div class="phone-input">
+        <select>
+            <option value="+91">🇮🇳 +91</option>
+        </select>
+        <input type="text" id="phone" placeholder="Enter phone number">
     </div>
 
+    <label>Referral / Discount Code</label>
+    <div class="discount-code">
+        <input type="text" id="discount" placeholder="Enter code">
+        <button onclick="applyDiscount()">Apply</button>
+        
+    </div>
+<button id="pay-btn">Pay <span id="pay-amount"></span></button>
+<p class="secure">🔒 Payments are secure and encrypted</p>
+</div>
     <script>
-        function applyDiscount() {
-            let discountInput = document.getElementById("discount").value;
-            let payButton = document.getElementById("pay-btn");
-            let amount = document.getElementById("amount");
 
-            if (discountInput === "SAVE10") {
-                amount.value = "₹7,559.00"; // 10% off
-                payButton.innerText = "Pay ₹7,559.00";
-                alert("Discount applied! 10% off.");
+document.addEventListener("DOMContentLoaded", function () {
+    let storedDate = localStorage.getItem("selectedDate");
+    let storedTime = localStorage.getItem("selectedTime");
+    let therapistName = localStorage.getItem("therapistName");
+    let therapistFee = localStorage.getItem("therapistFee");
+
+    // ✅ Fetch User Details
+    fetch("/get_user_details")
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("⚠️ " + data.error);
             } else {
-                alert("Invalid discount code.");
+                console.log("✅ User Data:", data);
+                document.getElementById("fullName").value = data.name || "User";
+                document.getElementById("email").value = data.email || "";
+                document.getElementById("phone").value = data.phone || "";
             }
+        })
+        .catch(error => console.error("❌ Error fetching user details:", error));
+
+    // ✅ Fetch Therapist Details
+    fetch("/get_therapist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ time: storedTime })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("⚠️ No therapist available at this time.");
+        } else {
+            console.log("✅ Therapist Found:", data);
+            
+            // ✅ Store therapist details in localStorage
+            localStorage.setItem("therapistName", data.name);
+            localStorage.setItem("therapistFee", data.fees.amount);
+
+            // ✅ Update UI with therapist details
+            let feeAmount = data.fees.amount || 0;
+            document.getElementById("amount").value = `₹${feeAmount}`;
+            document.getElementById("pay-btn").innerText = `Pay ₹${feeAmount}`;
         }
+    })
+    .catch(error => console.error("❌ Error fetching therapist:", error));
 
-        function confirmPayment() {
-        fetch("/confirm_booking", {
+    // ✅ Pay Button Click Event
+    document.getElementById("pay-btn").addEventListener("click", function () {
+        let appointmentData = {
+            fullName: document.getElementById("fullName").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            sessionDate: storedDate,
+            sessionTime: storedTime,
+            therapist: localStorage.getItem("therapistName"),
+            amount: document.getElementById("amount").value.replace("₹", ""), // Remove ₹ symbol
+            payment_status: "Pending"
+        };
+
+        console.log("📌 Sending Appointment Data:", appointmentData);
+
+        // ✅ Send data to backend
+        fetch("/store_appointment", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                "name": localStorage.getItem("selectedUser"),
-                "email": localStorage.getItem("selectedEmail"),
-                "phone": localStorage.getItem("selectedPhone"),
-                "therapist": localStorage.getItem("selectedTherapist"),
-                "date": localStorage.getItem("selectedDate"),
-                "time": localStorage.getItem("selectedTime"),
-                "amount": "899"
-            })
-        }).then(() => {
-            window.location.href = "/booking_success";
-        });
-    }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(appointmentData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("📩 Response from Server:", data);
+            if (data.status === "success") {
+                alert("🎉 Appointment booked successfully!");
+                window.location.href = "/mentalhome";  // ✅ Redirect to profile page
+            } else {
+                alert("❌ Error booking appointment.");
+            }
+        })
+        .catch(error => console.error("❌ Error storing appointment:", error));
+    });
+});
 
-        function goToHome() {
-    window.location.href = '/mentalhome'; // Change this to the actual homepage URL
+// ✅ Apply Discount Function
+function applyDiscount() {
+    let discountInput = document.getElementById("discount").value;
+    let payButton = document.getElementById("pay-btn");
+    let amount = document.getElementById("amount");
+
+    if (discountInput === "SAVE10") {
+        let originalAmount = parseFloat(amount.value.replace("₹", ""));
+        let discountedAmount = originalAmount * 0.9; // 10% discount
+        amount.value = `₹${discountedAmount.toFixed(2)}`;
+        payButton.innerText = `Pay ₹${discountedAmount.toFixed(2)}`;
+        alert("🎉 Discount applied! 10% off.");
+    } else {
+        alert("❌ Invalid discount code.");
+    }
 }
 
+// ✅ Redirect to Home Page
+function goToHome() {
+    window.location.href = '/mentalhome';
+}
     </script>
 </body>
 </html>

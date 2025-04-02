@@ -81,10 +81,10 @@
 </head>
 <body>
     <div class="left">
-        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\download (3).jpeg" alt="Left side image">
+        <img src="{{ url_for('static', filename='images/download_3.jpeg') }}" alt="Left side image">
     </div>
     <div class="right">
-        <img src="C:\Users\Asus\OneDrive\Desktop\College Stuff\vitality\images\TG_ AliceFM _ текстура мятой бумаги • сторис • визуал • инстаграм • дизайн.jpeg" alt="Right side image">
+        <img src="{{ url_for('static', filename='images/textured_paper.jpeg') }}"alt="Right side image">
         <div class="content">
             <h1>LIFESTYLE</h1>
             <hr>
@@ -103,9 +103,30 @@
     </div>
 
     <script>
-        function nextPage() {
-            window.location.href = '/lifestyleQ1'; // Navigate to the Goals page
+    function nextPage() {
+        let lastResponse = localStorage.getItem("lastQuizResponse");
+
+        if (lastResponse) {
+            fetch("http://127.0.0.1:5000/store_quiz_response", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: lastResponse
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response saved:", data);
+                localStorage.removeItem("lastQuizResponse"); // Clear stored response
+                window.location.href = '/lifestyleQ1.html'; // Proceed to Lifestyle Q1
+            })
+            .catch(error => {
+                console.error("Fetch Error:", error);
+                alert("Error storing data. Please try again.");
+            });
+        } else {
+            window.location.href = '/lifestyleQ1'; // If no data, proceed normally
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>

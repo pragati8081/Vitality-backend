@@ -235,8 +235,9 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
+        alert(`You selected Option ${optionNumber}`);
+
         let response = {
             question_id: "Q5",
             selected_option: optionNumber,
@@ -257,19 +258,8 @@
         })
         .then(data => console.log("Response saved:", data))
         .catch(error => console.error("Fetch Error:", error));
-    }
 
-    function goBack() {
-        window.location.href = '/basicQ4';
-    }
-
-    function goNext() {
-        window.location.href = '/basicQ6';
-    }
-    function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
-    }
-    function selectOption(optionNumber) {
+        // Handle "Other" input display
         if (optionNumber === 2) {
             document.getElementById("other-input-container").style.display = "flex";
         } else {
@@ -285,6 +275,19 @@
             alert("Please enter a value.");
         }
     }
-  </script>
+
+    function goBack() {
+        window.location.href = '/basicQ4';
+    }
+
+    function goNext() {
+        window.location.href = '/basicQ6';
+    }
+
+    function goToHome() {
+        window.location.href = '/physicalhome'; // Change to actual homepage URL
+    }
+</script>
+
 </body>
 </html>
