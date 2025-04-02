@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request,  jsonify,session, redirect,url_for
+from flask import Flask, render_template, request,  jsonify,session, redirect,url_for,json
 from flask_pymongo import PyMongo
+from pymongo import MongoClient
 import bcrypt
 from datetime import datetime , timedelta
 from random import randint
 from bson import ObjectId
 from werkzeug.security import generate_password_hash
-from bson import ObjectId
+from collections import Counter
 
 app = Flask(__name__)
 
@@ -22,7 +23,10 @@ mongo = PyMongo(app)
 quiz_responses = mongo.db.quiz_responses
 users_collection = mongo.db.users  
 therapists_collection = mongo.db.therapists
-appointments_collection = mongo.db.appointments  # Collection to store therapist bookings
+appointments_collection = mongo.db.appointments  
+disease_mapping_collection = mongo.db.disease_mapping
+disease_collection = mongo.db.disease
+medicine_collection = mongo.db.medicine
 
 otp_storage = {} 
 @app.route('/forgot_password')
@@ -199,14 +203,15 @@ def login_page():
 
         if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
             session.clear()
-            session['user_id'] = str(user['_id'])
+            session['user_id'] = str(user['_id'])  # ✅ Store as string
             session['user'] = email
-            print("✅ Login successful!")
+            print(f"✅ Login successful! User ID: {session['user_id']}")
             return jsonify({'message': 'Login successful!'}), 200
         else:
-            return jsonify({'message': 'Invalid email or password'}), 401  # 🔹 Better error message
+            return jsonify({'message': 'Invalid email or password'}), 401
 
     return render_template('login.html')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup_page():
@@ -230,7 +235,7 @@ def signup_page():
             'email': email,
             'password': hashed_password
         })
-        return jsonify({'message': 'User registered successfully!'}), 400
+        return jsonify({'message': 'User registered successfully!'}), 201
 
     return render_template('signup.html')  # Serve signup page for GET requests
         
@@ -377,10 +382,383 @@ def goals_q9():
 def goals_q10():
     return render_template('goalsQ10.html')
 
+def get_user_quiz_responses():
+    """Fetch the logged-in user's quiz responses from MongoDB"""
+    if "user_id" not in session:
+        print("🚨 No user logged in.")
+        return None  
 
-@app.route('/recommendation')
+    user_id = session["user_id"]
+    print(f"🔍 Fetching quiz responses for user_id: {user_id}")
+
+    user_responses = mongo.db.quiz_responses.find_one({
+        "user_id": user_id, 
+        "quiz_category": "physical_health"
+    })
+
+    if not user_responses:
+        print(f"🚨 No quiz responses found for user_id: {user_id}")
+        return None
+
+    print("✅ User response found:", user_responses)
+    return user_responses  # ✅ Return the actual responses instead of boolean
+
+
+def detect_deficiencies(responses):
+    """Analyze quiz responses to detect deficiencies based on user inputs."""
+    print("DEBUG: Full User Response ->", responses)  
+
+    deficiencies = []
+
+    if not responses:
+        print("🚨 No responses found for deficiency detection.")
+        return deficiencies
+
+    print("DEBUG: Available categories:", responses.get("Physical Health", {}).keys())
+
+    physical_health = responses.get("Physical Health", {})
+    basic = physical_health.get("Basic", {})
+    lifestyle = physical_health.get("LifeStyle", {})
+
+    # Helper function to retrieve and validate answers
+    def get_answer(question_id, category):
+        """Fetch and validate an answer for a given question."""
+        answer = category.get(question_id, {}).get("answer")
+        return str(answer) if answer is not None else None 
+
+    # Mapping Functions
+    def apply_mapping(question_id, category, mapping):
+        """Fetch the answer and apply the mapping if valid."""
+        answer = get_answer(question_id, category)
+        return mapping.get(answer) if answer in mapping else None  # ✅ Corrected synta
+
+    # 1. Age Mapping
+    age_mapping = {
+        "1": "Iron & Zinc Deficiency (Growth Phase)",
+        "2": "General Nutritional Maintenance",
+        "3": "General Nutritional Maintenance",
+        "4": "General Nutritional Maintenance",
+        "5": "Calcium & Vitamin D Deficiency (Age Factor)"
+    }
+    deficiencies.append(apply_mapping("Q1", basic, age_mapping))
+
+    # 2. Gender Mapping
+    gender_mapping = {
+        "1": "Zinc Deficiency (Muscle Recovery)",
+        "2": "Iron Deficiency (Higher Risk in Women)",
+        "3": "Individualized Nutrient Needs"
+    }
+    deficiencies.append(apply_mapping("Q2", basic, gender_mapping))
+
+    # 3. Height Mapping
+    height_mapping = {
+        "1": "Bone Health Risk (Short Stature)",
+        "2": "Normal Growth Potential",
+        "3": "Normal Growth Potential",
+        "4": "Higher Caloric & Protein Needs"
+    }
+    deficiencies.append(apply_mapping("Q3", basic, height_mapping))
+
+    # 4. Weight Mapping
+    weight_mapping = {
+        "1": "Malnutrition Risk (Underweight)",
+        "2": "Balanced Weight Maintenance",
+        "3": "Balanced Weight Maintenance",
+        "4": "Balanced Weight Maintenance",
+        "5": "Obesity Risk & Metabolic Imbalance"
+    }
+    deficiencies.append(apply_mapping("Q4", basic, weight_mapping))
+
+    # 5. Allergies
+    if get_answer("Q5", basic) == "2":
+        deficiencies.append("Dietary Restrictions May Cause Nutrient Deficiency")
+
+    # 6. Medical Conditions
+    medical_mapping = {
+        "PCOS/PCOD": "Hormonal Imbalance Risk (PCOS/PCOD)",
+        "Thyroid Disorder": "Iodine Deficiency (Thyroid Issue)",
+        "Diabetes": "Blood Sugar Imbalance Risk",
+        "Other": "Potential Nutritional Deficiencies (Medical Condition)"
+    }
+    deficiencies.append(apply_mapping("Q6", basic, medical_mapping))
+
+    # 7. Medication Effects
+    if get_answer("Q7", basic) == "Yes":
+        deficiencies.append("Possible Nutrient Absorption Issues")
+
+    # 8. Doctor Visits
+    doctor_visit_mapping = {
+        "1": "Unmonitored Health Risks",
+        "2": "Moderate Health Monitoring",
+        "3": "Regular Checkups Maintained",
+        "4": "Well-Monitored Health"
+    }
+    deficiencies.append(apply_mapping("Q8", basic, doctor_visit_mapping))
+
+    # 9. Diet Type
+    diet_mapping = {
+        "1": "Vitamin B12 & Iron Deficiency (Diet Restriction)",
+        "2": "Vitamin B12 & Iron Deficiency (Diet Restriction)",
+        "3": "Folate Deficiency Risk",
+        "4": "Calcium & Vitamin D Deficiency",
+        "5": "No Dietary Deficiencies"
+    }
+    deficiencies.append(apply_mapping("Q9", basic, diet_mapping))
+
+    # 10. Energy Levels
+    energy_mapping = {
+        "1": "Iron & Vitamin D Deficiency (Low Energy)",
+        "2": "Balanced Energy Levels",
+        "3": "Good Energy Balance"
+    }
+    deficiencies.append(apply_mapping("Q10", basic, energy_mapping))
+
+    # --- Lifestyle-Based Deficiencies ---
+    lifestyle_mappings = {
+        "Q1": {  # Sleep Mapping
+            "1": ["Fatigue", "Weak Immunity", "Low Focus"],
+            "2": ["Mild Fatigue"],
+            "3": ["Healthy Sleep"],
+            "4": ["Oversleeping Risks"]
+        },
+        "Q2": {  # Exercise Frequency
+            "1": ["Weak Muscles", "Low Endurance"],
+            "2": ["Moderate Fitness"],
+            "3": ["Good Fitness"],
+            "4": ["High Energy Levels"]
+        },
+        "Q3": {  # Exercise Type
+            "1": ["Heart Health Benefits"],
+            "2": ["Muscle Growth"],
+            "3": ["Flexibility & Stress Reduction"],
+            "4": ["Weak Muscles", "Low Stamina"]
+        },
+        "Q4": {  # Stress Levels
+            "1": ["Balanced Health"],
+            "2": ["Mild Anxiety Risks"],
+            "3": ["High Cortisol, Anxiety"],
+            "4": ["Severe Stress, Fatigue"]
+        },
+        "Q5": {  # Fast Food Consumption
+            "1": ["Good Nutrition"],
+            "2": ["Moderate Junk Food Intake"],
+            "3": ["Risk of Deficiencies"],
+            "4": ["High Cholesterol, Poor Nutrition"]
+        },
+        "Q6": {  # Water Intake
+            "1": ["Dehydration Risk", "Low Energy"],
+            "2": ["Adequate Hydration"],
+            "3": ["Optimal Hydration"],
+            "4": ["High Hydration"]
+        },
+        "Q7": {  # Screen Time
+            "1": ["Minimal Eye Strain"],
+            "2": ["Moderate Eye Strain"],
+            "3": ["Risk of Digital Eye Fatigue"],
+            "4": ["High Risk of Eye Fatigue, Poor Sleep"]
+        },
+        "Q8": {  # Alcohol Consumption
+            "1": ["Good Liver Health"],
+            "2": ["Potential Health Risks"],
+            "3": ["Liver Stress, Dehydration Risks"]
+        },
+        "Q9": {  # Smoking
+            "1": ["Lung Health Risks", "Heart Disease Risk"],
+            "2": ["Healthy Lungs"]
+        },
+        "Q10": {  # Relaxation/Self-Care
+            "1": ["Increased Stress Levels"],
+            "2": ["Moderate Stress Management"],
+            "3": ["Good Mental Balance"],
+            "4": ["Optimal Mental Health"]
+        }
+    }
+
+    for question, mapping in lifestyle_mappings.items():
+        answer = get_answer(question, lifestyle)
+        if answer in mapping:
+            deficiencies.extend(mapping[answer])
+
+    # Remove None values & duplicates
+    deficiencies = list(set(filter(None, deficiencies)))
+    print(f"🔍 Available Deficiencies in Dict: {list(deficiencies.keys())}")
+    print("DEBUG: Final Deficiency List Before Returning ->", deficiencies)
+    
+    return deficiencies
+
+def refine_deficiencies(detected_deficiencies):
+    priority_order = [
+        "Iron & Vitamin D Deficiency (Low Energy)",    
+        "Vitamin B12 & Iron Deficiency (Diet Restriction)",  
+        "Zinc Deficiency (Muscle Recovery)",  
+        "Weak Immunity",  
+        "Fatigue",  
+        "Low Focus",  
+        "Weak Muscles",  
+        "Low Endurance",  
+        "Heart Health Benefits",  
+        "Moderate Junk Food Intake",  
+        "Unmonitored Health Risks",  
+        "Balanced Weight Maintenance",  
+        "General Nutritional Maintenance",  
+        "Normal Growth Potential",  
+        "Balanced Health"  # Only if no other deficiencies exist
+    ]
+    
+    if not detected_deficiencies:
+        print("⚠️ No deficiencies detected, assigning default deficiency")
+        return ["Vitamin D Deficiency"]  # ✅ Assign a default deficiency only if the list is empty
+
+    # Remove contradictory results
+    if "Balanced Health" in detected_deficiencies:
+        detected_deficiencies = [d for d in detected_deficiencies if d != "Balanced Health"]
+    
+    # Remove redundancy & group deficiencies
+    grouped_deficiencies = set()
+    for deficiency in detected_deficiencies:
+        if "Iron" in deficiency or "Vitamin B12" in deficiency:
+            grouped_deficiencies.add("Iron & Vitamin Deficiency")
+        elif "Zinc" in deficiency:
+            grouped_deficiencies.add("Zinc Deficiency")
+        elif "Immunity" in deficiency:
+            grouped_deficiencies.add("Weak Immunity")
+        else:
+            grouped_deficiencies.add(deficiency)
+
+    # Sort deficiencies based on priority
+    sorted_deficiencies = sorted(grouped_deficiencies, key=lambda x: priority_order.index(x) if x in priority_order else float('inf'))  # ✅ Prevent errors if deficiency is not in the list
+
+    # Return only the top 4 deficiencies
+    return sorted_deficiencies[:4]
+
+
+@app.route("/analyze_quiz", methods=["GET"])
+def analyze_quiz():
+    """Fetch user responses, detect deficiencies, and return results."""
+    responses = get_user_quiz_responses()
+    
+    if not responses:
+        print("🚨 No quiz responses found for the user.")
+        return jsonify({"deficiencies": [], "message": "No quiz responses found"}), 404
+    
+    deficiencies = detect_deficiencies(responses) or []  # ✅ Ensure a list is always returned
+    print(f"✅ Analysis completed! User Deficiencies: {deficiencies}")
+    
+    return jsonify({"deficiencies": deficiencies})
+
+
+@app.route('/recommendation', methods=['GET'])
 def recommendation():
-    return render_template('recommendation.html')
+    """Fetch recommended multivitamins from user responses and display them."""
+    if 'user_id' not in session:
+        print("🚨 User not logged in.")
+        return jsonify({"error": "User not logged in"}), 401  
+
+    user_id = session['user_id']
+    print(f"🔍 Fetching quiz responses for user_id: {user_id}")
+
+    user_responses = mongo.db.quiz_responses.find_one({"user_id": user_id})
+
+    if not user_responses:
+        print(f"🚨 No quiz responses found for user_id: {user_id}")
+        return jsonify({"error": "No quiz responses found"}), 404
+
+    # Extract recommended multivitamin names
+    recommended_multivitamins = user_responses.get("recommended_multivitamins", [])[:4]
+
+    print("✅ Recommended Multivitamin Names:", recommended_multivitamins)  # Debugging Line
+
+    return render_template('recommendation.html', multivitamins=recommended_multivitamins)
+
+def map_deficiencies_to_multivitamins(deficiencies):
+    """Maps deficiencies to recommended multivitamins from the provided list."""
+    
+    deficiency_to_multivitamin = {
+    "Weak Muscles": [
+        {"name": "GNC Mega Men Sport", "image": "{{ url_for('static', filename='images/a.jpeg') }}"},
+        {"name": "MuscleBlaze MB-Vite Multivitamin", "image": "{{ url_for('static', filename='images/b.jpeg') }}"},
+        {"name": "Optimum Nutrition Opti-Men", "image": "{{ url_for('static', filename='images/c.jpeg') }}"}
+    ],
+    "Low Endurance": [
+        {"name": "Revital H Men Multivitamin", "image":"{{ url_for('static', filename='images/d.jpeg') }}"},
+        {"name": "GNC Mega Men Sport", "image":"{{ url_for('static', filename='images/a.jpeg') }}"},
+        {"name": "Swisse Ultivite Men's Multivitamin", "image":"{{ url_for('static', filename='images/e.jpeg') }}"}
+    ],
+    "Unmonitored Health Risks": [
+        {"name": "Centrum Men Multivitamin", "image": "{{ url_for('static', filename='images/f.jpeg') }}"},
+        {"name": "HealthKart HK Vitals Multivitamin", "image": "{{ url_for('static', filename='images/g.jpeg') }}"}
+    ],
+    "Zinc Deficiency (Muscle Recovery)": [
+        {"name": "Zincovit Tablet", "image": "{{ url_for('static', filename='images/h.jpeg') }}"},
+        {"name": "Supradyn Daily Multivitamin", "image": "{{ url_for('static', filename='images/i.jpeg') }}"}
+    ],
+    "Normal Growth Potential": [
+        {"name": "Pure Nutrition Men's Multi Vitamin", "image": "{{ url_for('static', filename='images/j.jpeg') }}"},
+        {"name": "Healthvit Cenvitan Men Multivitamin", "image": "{{ url_for('static', filename='images/k.jpeg') }}"}
+    ],
+    "Balanced Health": [
+        {"name": "Centrum Women Multivitamin", "image": "{{ url_for('static', filename='images/l.jpeg') }}"},
+        {"name": "Centrum Men Multivitamin", "image":  "{{ url_for('static', filename='images/f.jpeg') }}"},
+        {"name": "Supradyn Daily Multivitamin", "image":  "{{ url_for('static', filename='images/i.jpeg') }}"}
+    ],
+
+    "General Nutritional Maintenance": [
+        {"name": "Centrum Men Multivitamin", "image": "{{ url_for('static', filename='images/f.jpeg') }}"},
+        {"name": "Supradyn Daily Multivitamin", "image":  "{{ url_for('static', filename='images/i.jpeg') }}"},
+        {"name": "HealthKart HK Vitals Multivitamin", "image": "{{ url_for('static', filename='images/g.jpeg') }}"}
+    ],
+    "Heart Health Benefits": [
+        {"name": "GNC Mega Men One Daily", "image": "{{ url_for('static', filename='images/a.jpeg') }}"},
+        {"name": "Swisse Ultivite Men's Multivitamin", "image": "{{ url_for('static', filename='images/e.jpeg') }}"},
+        {"name": "Seven Seas Perfect 7", "image": "{{ url_for('static', filename='images/m.jpeg') }}"}
+    ],
+    "Balanced Weight Maintenance": [
+        {"name": "Liveasy Wellness Multivitamin Multimineral", "image": "{{ url_for('static', filename='images/n.jpeg') }}"},
+        {"name": "HealthKart HK Vitals Multivitamin", "image": "{{ url_for('static', filename='images/g.jpeg') }}"}
+    ],
+    "Weak Immunity": [
+        {"name": "Zincovit Tablet", "image": "{{ url_for('static', filename='images/h.jpeg') }}"},
+        {"name": "MuscleTech Platinum Multivitamin", "image": "{{ url_for('static', filename='images/o.jpeg') }}"},
+        {"name": "Neurobion Forte Vitamin B12 Tablet", "image": "{{ url_for('static', filename='images/s.jpeg') }}"}
+    ],
+    "Low Focus": [
+        {"name": "GNC Mega Men One Daily", "image":"{{ url_for('static', filename='images/a.jpeg') }}"},
+        {"name": "Omega-3 Supplements", "image": "{{ url_for('static', filename='images/p.jpeg') }}"},
+        {"name": "Swisse Ultivite Men's Multivitamin", "image":"{{ url_for('static', filename='images/e.jpeg') }}"}
+    ],
+    "Fatigue": [
+        {"name": "Becozym C Forte", "image": "{{ url_for('static', filename='images/r.jpeg') }}"},
+        {"name": "Neurobion Forte Vitamin B12 Tablet", "image": "{{ url_for('static', filename='images/s.jpeg') }}"},
+        {"name": "Swisse Ultivite Women's Multivitamin", "image":"{{ url_for('static', filename='images/e.jpeg') }}"}
+    ],
+    "Vitamin B12 & Iron Deficiency (Diet Restriction)": [
+        {"name": "Neurobion Forte Vitamin B12 Tablet", "image": "{{ url_for('static', filename='images/r.jpeg') }}"},
+        {"name": "Shelcal 500mg", "image": "{{ url_for('static', filename='images/t.jpeg') }}"},
+        {"name": "Iron Supplement", "image":  "{{ url_for('static', filename='images/.jpeg') }}"},
+    ],
+    "Moderate Junk Food Intake": [
+        {"name": "Digestive Enzymes", "image":"{{ url_for('static', filename='images/q.jpeg') }}"},
+        {"name": "Probiotics", "image": "{{ url_for('static', filename='images/u.jpeg') }}"},
+        {"name": "Pharmeasy Multivitamin Multimineral", "image": "{{ url_for('static', filename='images/v.jpeg') }}"}
+                ],
+    "Iron & Vitamin D Deficiency (Low Energy)": [
+        {"name": "Shelcal 500mg", "image": "{{ url_for('static', filename='images/t.jpeg') }}"},
+        {"name": "Calcimax Forte Plus", "image": "{{ url_for('static', filename='images/w.jpeg') }}"},
+        {"name": "Optimum Nutrition Opti-Women","image":  "{{ url_for('static', filename='images/x.jpeg') }}"}
+    ]
+
+}
+    
+    recommended_multivitamins = []
+    
+    for deficiency in deficiencies:
+        if deficiency in deficiency_to_multivitamin:
+            recommended_multivitamins.extend(deficiency_to_multivitamin[deficiency])
+            print(f"✅ Added recommendations for {deficiency}: {deficiency_to_multivitamin[deficiency]}")
+
+    return render_template("recommendation.html")
+    
+    return recommended_multivitamins[:4]  # Return only the top 4 recommendations
 
 @app.route('/mentalhome')
 def mentalhome():
@@ -454,70 +832,15 @@ def mental16():
 def submitpage():
     return render_template('submitpage.html')
 
-@app.route("/get_therapist_details", methods=["GET"])
-def get_therapist_details():
+def normalize_time_format(time_str):
+    """Ensure time format matches MongoDB stored slots"""
+    from datetime import datetime
+
     try:
-        if 'user_id' not in session:
-            return jsonify({"error": "User not logged in"}), 401
-
-        user_id = session['user_id']
-        appointment = mongo.db.appointments.find_one({"user_id": user_id})
-
-        if not appointment:
-            return jsonify({"error": "No therapy appointments found"}), 404
-
-        therapist = mongo.db.therapists.find_one({"_id": appointment["therapist_id"]})
-
-        if not therapist:
-            return jsonify({"error": "Therapist details not found"}), 404
-
-        return jsonify({
-            "therapist_name": therapist["name"],
-            "specialization": therapist["specialization"],
-            "date": appointment["date"],
-            "time": appointment["time"],
-            "amount_paid": appointment["amount_paid"]
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/details')
-def details():
-    return render_template('details.html')
-
-@app.route('/mentalpayment')
-def mentalpayment():
-    return render_template('mentalpayment.html')
-
-@app.route("/confirm_booking", methods=["POST"])
-def confirm_booking():
-    user_name = request.form["name"]
-    email = request.form["email"]
-    phone = request.form["phone"]
-    therapist_name = request.form["therapist"]
-    session_date = request.form["date"]
-    session_time = request.form["time"]
-    amount_paid = request.form["amount"]
-
-    # Store in MongoDB
-    mongo.db.appointments.insert_one({
-        "user_name": user_name,
-        "email": email,
-        "phone": phone,
-        "therapist": therapist_name,
-        "date": session_date,
-        "time": session_time,
-        "amount_paid": amount_paid
-    })
-
-    return redirect("/booking_success")
-
-# Route to display booking success page
-@app.route("/booking_success")
-def booking_success():
-    return "Booking confirmed! Your session has been scheduled."
+        formatted_time = datetime.strptime(time_str, "%I:%M %p").strftime("%I:%M %p")
+        return formatted_time
+    except ValueError:
+        return time_str  # Return as is if formatting fails
 
 @app.route('/vitalitycheckout')
 def vitalitycheckout():
@@ -531,41 +854,85 @@ def store_quiz_response():
 
     try:
         data = request.json
-        print("📩 Received Data:", data)  # ✅ Debugging log
+        print("📩 Full Received Data:", data)  # ✅ Debugging
 
         user_id = session['user_id']
         question_id = data.get('question_id')
         selected_option = data.get('selected_option')
-        score = data.get('score', 0)  # Default score is 0 if missing
-        quiz_category = data.get('quiz_category')
+        quiz_category = data.get('quiz_category')  # "mental_health" or "physical_health"
+        level = data.get('level')  # Only for physical health
 
-        if not question_id or not selected_option or not quiz_category:
-            print("❌ Error: Incomplete data received!")
-            return jsonify({"error": "Incomplete data"}), 400
+        # ✅ Check for missing fields
+        if quiz_category == "physical_health":
+            required_fields = ['question_id', 'selected_option', 'quiz_category', 'level']
+        else:  # Mental health doesn't have levels
+            required_fields = ['question_id', 'selected_option', 'quiz_category', 'score']
 
-        # ✅ Debugging before saving to MongoDB
-        print(f"📝 Storing: user_id={user_id}, question_id={question_id}, answer={selected_option}, score={score}")
+        missing_fields = [field for field in required_fields if data.get(field) is None]
+        if missing_fields:
+            print(f"❌ Error: Missing fields - {missing_fields}")
+            return jsonify({"error": f"Incomplete data. Missing: {missing_fields}"}), 400
 
-        # ✅ Ensure correct MongoDB structure
-        result = quiz_responses.update_one(
-            {"user_id": str(user_id), "quiz_category": quiz_category},
-            {"$set": {
-                f"responses.{question_id}": {
-                    "answer": selected_option,  
-                    "score": score,  
-                    "timestamp": datetime.utcnow()
+        # ✅ Separate storage logic
+        if quiz_category == "mental_health":
+            score = data.get('score', 0)  # Only for mental health
+            print(f"📝 Storing (Mental Health): user_id={user_id}, question_id={question_id}, answer={selected_option}, score={score}")
+
+            update_data = {
+                "user_id": str(user_id),
+                "category": "mental_health",
+                "responses": {
+                    question_id: {
+                        "answer": selected_option,
+                        "score": score,
+                        "timestamp": datetime.utcnow()
+                    }
                 }
-            }},
-            upsert=True
-        )
+            }
 
-        # ✅ Debugging MongoDB Update
-        print("✅ MongoDB Update Result:", result.raw_result)
+            # ✅ Update or insert mental health quiz data
+            quiz_responses.update_one(
+                {"user_id": str(user_id), "category": "mental_health"},
+                {"$set": {f"responses.{question_id}": update_data["responses"][question_id]}},
+                upsert=True
+            )
 
-        return jsonify({"message": "Response stored successfully!"}), 201
+        elif quiz_category == "physical_health":
+            if not level:
+                print("❌ Error: Level required for physical health")
+                return jsonify({"error": "Level is required for physical health"}), 400
+
+            print(f"📝 Storing (Physical Health): user_id={user_id}, level={level}, question_id={question_id}, answer={selected_option}")
+
+            update_data = {
+                "user_id": str(user_id),
+                "category": "physical_health",
+                "responses": {
+                    level: {
+                        question_id: {
+                            "answer": selected_option,
+                            "timestamp": datetime.utcnow()
+                        }
+                    }
+                }
+            }
+
+            # ✅ Update or insert physical health quiz data
+            quiz_responses.update_one(
+                {"user_id": str(user_id), "category": "physical_health"},
+                {"$set": {f"responses.{level}.{question_id}": update_data["responses"][level][question_id]}},
+                upsert=True
+            )
+
+        else:
+            print("❌ Error: Invalid quiz_category received")
+            return jsonify({"error": "Invalid quiz category"}), 400
+
+        print("✅ Response stored successfully!")
+        return jsonify({"message": f"{quiz_category.capitalize()} response stored successfully!"}), 201
 
     except Exception as e:
-        print("🚨 Error in /store_quiz_response:", str(e))  # ✅ Log error
+        print("🚨 Error in /store_quiz_response:", str(e))
         return jsonify({"error": str(e)}), 500
     
 @app.route('/calculate_score', methods=['GET'])
@@ -576,15 +943,142 @@ def calculate_score():
     user_id = session['user_id']
 
     # ✅ Fetch user responses from MongoDB
-    user_quiz = quiz_responses.find_one({"user_id": str(user_id), "quiz_category": "mental_health"})
+    user_quiz = quiz_responses.find_one({"user_id": str(user_id)})
 
-    if not user_quiz or "responses" not in user_quiz:
+    if not user_quiz or "mental_health" not in user_quiz:
         return jsonify({"error": "No responses found"}), 404
 
-    total_score = sum(response.get("score", 0) for response in user_quiz["responses"].values())
+    total_score = 0
+    # ✅ Iterate through mental_health responses and sum scores
+    for key, value in user_quiz["mental_health"].items():
+        if isinstance(value, dict) and "score" in value:
+            total_score += value["score"]  # ✅ Directly sum stored scores
 
-    # ✅ Return the total score
+    print("✅ Final Calculated Score:", total_score)  # Debugging
+
     return jsonify({"total_score": total_score})
+
+
+@app.route('/details')
+def details():
+    return render_template('details.html')
+
+@app.route("/get_user_details", methods=["GET"])
+def get_user_details():
+    user_id = session.get("user_id")
+    print(f"🔍 Debug: Session user_id = {user_id}")
+
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    try:
+        # Fetch user details from MongoDB
+        user = users_collection.find_one(
+            {"_id": ObjectId(user_id)},
+            {"_id": 0, "name": 1, "first_name": 1, "last_name": 1, "email": 1}
+        )
+
+        if user:
+            # Ensure 'name' exists by combining first_name and last_name
+            user["name"] = user.get("name") or f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+
+            print(f"✅ User Data: {user}")  # Debugging log
+            return jsonify(user)
+        else:
+            print("❌ User Not Found in MongoDB")
+            return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        print(f"🚨 Error Fetching User: {e}")
+        return jsonify({"error": "Invalid user ID format"}), 400
+
+@app.route("/get_therapist", methods=["POST"])
+def get_therapist():
+    data = request.json
+    selected_time = normalize_time_format(data.get("time"))  # Normalize time format
+
+    print(f"📌 Received request for time slot: {selected_time}")  # Debugging log
+
+    therapist = therapists_collection.find_one({"slots": selected_time}, {"_id": 0, "name": 1, "fees": 1})
+
+    if therapist:
+        print(f"✅ Assigned Therapist: {therapist}")
+        return jsonify(therapist)
+    else:
+        print("❌ No therapist found for this slot")
+        return jsonify({"error": "No therapist available at this time"}), 404
+
+
+@app.route("/store_appointment", methods=["POST"])
+def store_appointment():
+    if "user_id" not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    try:
+        data = request.json  
+        print("📩 Received Appointment Data:", data)  # Debugging log
+
+        if not data:
+            return jsonify({"error": "No data received"}), 400
+
+        # ✅ Check if therapist name is available
+        therapist_name = data.get("therapist")
+        if not therapist_name:
+            return jsonify({"error": "Therapist selection missing"}), 400
+
+        # ✅ Convert `session_date` to Proper Format (YYYY-MM-DD)
+        session_date_str = data.get("sessionDate")
+        session_date = datetime.strptime(session_date_str, "%Y-%m-%d").strftime("%Y-%m-%d")
+
+        appointment_data = {
+            "user_id": session["user_id"],
+            "user_name": data.get("fullName"),
+            "email": data.get("email"),
+            "phone": data.get("phone"),
+            "session_date": session_date,
+            "session_time": data.get("sessionTime"),
+            "therapist": therapist_name,  # ✅ Store the correct therapist
+            "amount": data.get("amount"),
+            "payment_status": "Pending",
+            "created_at": datetime.utcnow()
+        }
+
+        print("📌 Inserting into MongoDB:", appointment_data)  # Debugging log
+
+        result = appointments_collection.insert_one(appointment_data)
+
+        if result.inserted_id:
+            print("✅ Appointment Stored Successfully!")
+            return jsonify({"message": "Appointment booked successfully!", "status": "success"}), 201
+        else:
+            print("❌ Failed to Insert Appointment")
+            return jsonify({"error": "Database insert failed"}), 500
+
+    except Exception as e:
+        print("🚨 Error Saving Appointment:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/mentalpayment')
+def mentalpayment():
+    return render_template('mentalpayment.html')
+
+@app.route("/get_appointments", methods=["GET"])
+def get_appointments():
+    appointments = list(mongo.db.appointments.find({}, {"_id": 0}))  # "_id" exclude kar diya
+    formatted_appointments = []
+
+    for appointment in appointments:
+        formatted_appointments.append({
+            "username": appointment.get("user_name", "N/A"),
+            "therapist_name": appointment.get("therapist", "N/A"),
+            "date": appointment.get("session_date", "N/A"),
+            "time": appointment.get("session_time", "N/A"),
+            "amount": appointment.get("amount", "N/A"),
+            "payment_status": appointment.get("payment_status", "N/A")
+        })
+
+    print("Fetched Appointments:", formatted_appointments)  # Debugging ke liye
+    return jsonify(formatted_appointments)
+
 
 @app.route('/logout')
 def logout():
