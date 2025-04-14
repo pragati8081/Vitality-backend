@@ -242,28 +242,28 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
+
         let response = {
             question_id: "Q9",
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health", // ✅ lowercase to match backend
             level: "Basic"
         };
 
-        console.log("Option Selected:", response);  // ✅ Debugging log
+        console.log("📤 Sending Response:", response);
 
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
+        fetch("http://127.0.0.1:5000/store_quiz_response", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response)
         })
         .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
+            console.log("📥 Fetch Response Status:", response.status);
             return response.json();
         })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+        .then(data => console.log("✅ Response saved:", data))
+        .catch(error => console.error("🚨 Fetch Error:", error));
     }
 
     function goBack() {
@@ -273,9 +273,11 @@
     function goNext() {
         window.location.href = '/basicQ10';
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome';
     }
-  </script>
+</script>
+
 </body>
 </html>

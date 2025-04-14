@@ -227,41 +227,47 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
-        let response = {
-            question_id: "Q2",
-            selected_option: optionNumber,
-            quiz_category: "Physical Health",
-            level: "Basic"
-        };
-
-        console.log("Option Selected:", response);  // ✅ Debugging log
-
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response)
-        })
-        .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
-            return response.json();
-        })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+      const questionId = "Q2"; // ✅ Change based on page
+      const level = "Basic";   // ✅ Change based on quiz section
+  
+      const response = {
+        question_id: questionId,
+        selected_option: optionNumber,
+        quiz_category: "physical_health", // ✅ must match backend
+        level: level
+      };
+  
+      console.log("📤 Sending Quiz Response:", response);
+  
+      fetch("http://127.0.0.1:5000/store_quiz_response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response)
+      })
+      .then(response => {
+        console.log("📥 Fetch Response Status:", response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ Response Saved:", data);
+        // Optionally auto-move to next question
+        // goNext();
+      })
+      .catch(error => console.error("🚨 Fetch Error:", error));
     }
-
+  
     function goBack() {
-        window.location.href = '/basicQ1';
+      window.location.href = '/basicQ1';
     }
-
+  
     function goNext() {
-        window.location.href = '/basicQ3';
+      window.location.href = '/basicQ3';
     }
-
+  
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+      window.location.href = '/physicalhome';
     }
   </script>
+  
 </body>
 </html>

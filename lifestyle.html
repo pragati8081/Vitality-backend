@@ -101,32 +101,43 @@
             </div>
         </div>
     </div>
-
+    
     <script>
-    function nextPage() {
-        let lastResponse = localStorage.getItem("lastQuizResponse");
+  function nextPage() {
+    let lastResponse = localStorage.getItem("lastQuizResponse");
 
-        if (lastResponse) {
-            fetch("http://127.0.0.1:5000/store_quiz_response", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: lastResponse
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Response saved:", data);
-                localStorage.removeItem("lastQuizResponse"); // Clear stored response
-                window.location.href = '/lifestyleQ1.html'; // Proceed to Lifestyle Q1
-            })
-            .catch(error => {
-                console.error("Fetch Error:", error);
-                alert("Error storing data. Please try again.");
-            });
-        } else {
-            window.location.href = '/lifestyleQ1'; // If no data, proceed normally
-        }
+    if (lastResponse) {
+      // Ensure that lastResponse is a valid JSON string
+      try {
+        lastResponse = JSON.parse(lastResponse);
+      } catch (error) {
+        console.error("Error parsing the last quiz response:", error);
+        alert("There was an error with the saved data. Please try again.");
+        return;
+      }
+
+      // Send the response to the backend
+      fetch("http://127.0.0.1:5000/store_quiz_response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lastResponse)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Response saved:", data);
+        localStorage.removeItem("lastQuizResponse"); // Clear stored response
+        window.location.href = '/lifestyleQ1.html'; // Proceed to Lifestyle Q1
+      })
+      .catch(error => {
+        console.error("Fetch Error:", error);
+        alert("Error storing data. Please try again.");
+      });
+    } else {
+      window.location.href = '/lifestyleQ1'; // If no data, proceed normally
     }
+  }
 </script>
+
 
 </body>
 </html>

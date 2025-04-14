@@ -239,16 +239,13 @@
       </div>
     </div>
   </div>
-
-
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
         let response = {
-            question_id: "Q4",
+            question_id: "Q4",  // Update this with the correct question ID
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health",  // Corrected category name
             level: "LifeStyle"
         };
 
@@ -268,15 +265,17 @@
     }
 
     function goBack() {
-            window.location.href = '/lifestyleQ3'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ3'; // Navigate to the previous question (ensure this is correct)
     }
 
     function goNext() {
-            window.location.href = '/lifestyleQ5'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ5'; // Navigate to the next question (ensure this is correct)
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome'; // Navigate to the homepage
     }
-  </script>
+</script>
+
 </body>
 </html>

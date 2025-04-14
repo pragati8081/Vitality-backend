@@ -227,40 +227,46 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
-        let response = {
-            question_id: "Q3",
-            selected_option: optionNumber,
-            quiz_category: "Physical Health",
-            level: "Basic"
-        };
-
-        console.log("Option Selected:", response);  // ✅ Debugging log
-
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response)
-        })
-        .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
-            return response.json();
-        })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+      const questionId = "Q3"; // ✅ Set per question
+      const level = "Basic";   // ✅ Change as needed
+  
+      const response = {
+        question_id: questionId,
+        selected_option: optionNumber,
+        quiz_category: "physical_health", // ✅ Must match backend exactly
+        level: level
+      };
+  
+      console.log("📤 Sending Response:", response);
+  
+      fetch("http://127.0.0.1:5000/store_quiz_response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response)
+      })
+      .then(response => {
+        console.log("📥 Server Response Status:", response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ Response saved:", data);
+        // Optionally goNext(); to auto-navigate
+      })
+      .catch(error => console.error("🚨 Error sending response:", error));
     }
-        function goBack() {
-        window.location.href = '/basicQ2';
+  
+    function goBack() {
+      window.location.href = '/basicQ2';
     }
-
+  
     function goNext() {
-        window.location.href = '/basicQ4';
+      window.location.href = '/basicQ4';
     }
-
+  
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+      window.location.href = '/physicalhome';
     }
   </script>
+  
 </body>
 </html>

@@ -242,12 +242,11 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
         let response = {
-            question_id: "Q6",
+            question_id: "Q6",  // Ensure this corresponds to the current question
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health",  // Corrected quiz category
             level: "LifeStyle"
         };
 
@@ -265,16 +264,19 @@
         .then(data => console.log("Response saved:", data))
         .catch(error => console.error("Fetch Error:", error));
     }
+
     function goBack() {
-            window.location.href = '/lifestyleQ5'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ5'; // Navigate to the previous question (ensure this is correct)
     }
 
     function goNext() {
-            window.location.href = '/lifestyleQ7'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ7'; // Navigate to the next question (ensure this is correct)
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome'; // Navigate to the homepage
     }
-  </script>
+</script>
+
 </body>
 </html>

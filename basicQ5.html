@@ -236,43 +236,44 @@
   <script>
     function selectOption(optionNumber) {
         console.log(`Option ${optionNumber} selected`);
-        alert(`You selected Option ${optionNumber}`);
 
         let response = {
             question_id: "Q5",
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health",
             level: "Basic"
         };
 
-        console.log("Option Selected:", response);  // ✅ Debugging log
+        console.log("📤 Sending Response:", response);
 
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
+        fetch("http://127.0.0.1:5000/store_quiz_response", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response)
         })
         .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
+            console.log("📥 Fetch Response Status:", response.status);
             return response.json();
         })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+        .then(data => console.log("✅ Response saved:", data))
+        .catch(error => console.error("🚨 Fetch Error:", error));
 
-        // Handle "Other" input display
-        if (optionNumber === 2) {
-            document.getElementById("other-input-container").style.display = "flex";
-        } else {
-            document.getElementById("other-input-container").style.display = "none";
+        // Toggle "Other" input display
+        const otherInputContainer = document.getElementById("other-input-container");
+        if (optionNumber === 2 && otherInputContainer) {
+            otherInputContainer.style.display = "flex";
+        } else if (otherInputContainer) {
+            otherInputContainer.style.display = "none";
         }
     }
 
     function submitOther() {
-        let allergyInput = document.getElementById("other-input").value;
-        if (allergyInput.trim() !== "") {
-            alert("You specified: " + allergyInput);
+        let allergyInput = document.getElementById("other-input").value.trim();
+        if (allergyInput !== "") {
+            console.log("📝 User specified allergy: " + allergyInput);
+            // You can send this value to the backend if needed
         } else {
-            alert("Please enter a value.");
+            console.log("⚠️ No input provided in 'Other'");
         }
     }
 
@@ -285,7 +286,7 @@
     }
 
     function goToHome() {
-        window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome';
     }
 </script>
 

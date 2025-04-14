@@ -312,12 +312,11 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
         let response = {
-            question_id: "Q1",
+            question_id: "Q1",  // Ensure this corresponds to the current question
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health",  // Corrected quiz category
             level: "Goals"
         };
 
@@ -337,15 +336,17 @@
     }
 
     function goBack() {
-        window.location.href = '/goals';
+        window.location.href = '/goals';  // Navigate to the Goals page
     }
 
     function goNext() {
-        window.location.href = '/goalsQ2';
+        window.location.href = '/goalsQ2';  // Navigate to the next question
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome';  // Navigate to the homepage
     }
-  </script>
+</script>
+
 </body>
 </html>

@@ -241,42 +241,47 @@
   </div>
 
   <script>
-    
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
-        let response = {
-            question_id: "Q1",
-            selected_option: optionNumber,
-            quiz_category: "Physical Health",
-            level: "Basic"
-        };
-
-        console.log("Option Selected:", response);  // ✅ Debugging log
-
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response)
-        })
-        .then(response => {
-            console.log("Fetch Response Status:", response.status);  // ✅ Log response status
-            return response.json();
-        })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+      const questionId = "Q1"; // ✅ Update this dynamically for each question page
+      const level = "Basic";   // ✅ Update this depending on quiz level
+  
+      const response = {
+        question_id: questionId,
+        selected_option: optionNumber,
+        quiz_category: "physical_health", // ✅ lowercase to match Flask route check
+        level: level
+      };
+  
+      console.log("📤 Sending Quiz Response:", response);
+  
+      fetch("http://127.0.0.1:5000/store_quiz_response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response)
+      })
+      .then(response => {
+        console.log("📥 Server Status:", response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ Response Saved:", data);
+        // Optional: Show a custom message or mark the option as selected
+      })
+      .catch(error => console.error("🚨 Fetch Error:", error));
     }
-
+  
     function goBack() {
-        window.location.href = '/basic';
+      window.location.href = '/basic'; // ✅ Update based on current question routing
     }
-
+  
     function goNext() {
-        window.location.href = '/basicQ2';
+      window.location.href = '/basicQ2'; // ✅ Update for next question
     }
+  
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+      window.location.href = '/physicalhome'; // ✅ Update to your actual homepage
     }
   </script>
+  
 </body>
 </html>

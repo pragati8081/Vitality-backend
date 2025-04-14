@@ -148,49 +148,34 @@
 </head>
 <body>
 
-    <!-- Header Section -->
+<!-- Header Section -->
     <div class="header">
         <a href='/physicalhome' class="button">Back to Homepage</a>
         <div class="site-title">Vitality.com</div>
         <a href='/vitalitycheckout' class="button">Next</a>
     </div>
 
-    <!-- Recommendation Title -->
-    <h1 class="recommendation-title">Recommendation</h1>
+ <!-- Recommendation Title -->
+<h1 class="recommendation-title">Recommendation</h1>
 
-    <!-- Content Below Header -->
-    <div class="content">
-        <p>Based on your preferences, we've curated these recommendations just for you.</p>
-    </div>
+<!-- Content Below Header -->
+<div class="content">
+    <p>Based on your preferences, we've curated these recommendations just for you.</p>
+</div>
 
-    <!-- Recommendation Cards -->
-    <div class="card-container">
-        <div class="card">
-            <img src="{{ url_for('static', filename='images/pill1.jpeg') }}" alt="Recommendation Image">
-            <div class="card-content">
-                <p>Liveasy Wellness Multivitamin Multimineral</p>
+<!-- Recommendation Cards -->
+<div class="card-container">
+    {% for i in range(4) %}
+        {% if multivitamins|length > i %}
+            <div class="card">
+                <img src="{{ url_for('static', filename='images/pill' + (i+1) ~ '.jpeg') }}" alt="Recommendation Image">
+                <div class="card-content">
+                    <p>{{ multivitamins[i] }}</p>
+                </div>
             </div>
-        </div>
-        <div class="card">
-            <img src="{{ url_for('static', filename='images/pill2.jpeg') }}" alt="Recommendation Image">
-            <div class="card-content">
-                <p>Iron Supplement</p>
-            </div>
-        </div>
-        <div class="card">
-            <img src="{{ url_for('static', filename='images/pill3.jpeg') }}" alt="Recommendation Image">
-            <div class="card-content">
-                <p>Zincovit Tablet</p>
-                
-            </div>
-        </div>
-        <div class="card">
-            <img src="{{ url_for('static', filename='images/pill4.jpeg') }}" alt="Recommendation Image">
-            <div class="card-content">
-                <p>MuscleTech Platinum Multivitamin</p>
-            </div>
-        </div>
-    </div>
+        {% endif %}
+    {% endfor %}
+</div>
 
 </body>
 </html>

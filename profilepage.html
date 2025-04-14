@@ -198,6 +198,74 @@
             color: #5b3d2b;
             border: 2px solid #b38a6d;
         }
+
+        .therapy-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 25px;
+            background-color: #fdf3e3;
+            border: 2px solid #c9a582;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .therapy-container h2.title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #5c3d2e;
+        }
+
+        .therapy-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .therapy-table th, .therapy-table td {
+             padding: 12px 16px;
+             border-bottom: 1px solid #d9b99b;
+             color: #3e2a20;
+        }
+        td {
+            vertical-align: middle;
+        }
+
+
+        th, td {
+            white-space: nowrap;
+        }
+
+
+        .therapy-table td:last-child {
+            font-weight: bold;
+        }
+
+        .therapy-table td[style*="red"] {
+           color: red;
+        }
+
+        .therapy-table td[style*="green"] {
+             color: green;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .appointment-box {
+
+             display: flex;
+            justify-content: center;
+            align-items: center;
+             margin: 0 auto;
+            }
+
+        .appointment-table td, .appointment-table th {
+             font-size: 14px;
+             padding: 10px;
+            }
+
     </style>
 </head>
 <body>
@@ -321,10 +389,10 @@ function showSection(section) {
         password: `
             <h2>CHANGE PASSWORD</h2>
             <form id="passwordForm" onsubmit="event.preventDefault(); updatePassword();">
-                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
-                <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required></div>
-                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmNewPassword" required></div>
-                <div class="buttons"><button type="submit" class="save-btn">Update Password</button></div>
+                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" placeholder="Current Password" required></div>
+                <div class="form-group"><label>New Password</label> <input type="password" id="newPassword" placeholder="New Password" required></div>
+                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmNewPassword" placeholder="Confirm New Password" required></div>
+                <div class="buttons"><button type="submit"class="save-btn">Update Password</button></div>
             </form>
             `,
         orders: `<h2>ORDERS</h2><div class="info-box">Your order history will be visible here.</div>`,
@@ -341,7 +409,9 @@ if (section === "password") {
     document.querySelectorAll(".menu button").forEach(button => button.classList.remove("active"));
     document.querySelector(`.menu button[onclick="showSection('${section}')"]`).classList.add("active");
 }
-function updatePassword() {
+function updatePassword(event) {
+    event.preventDefault();
+
     const currentPassword = document.getElementById("currentPassword").value.trim();
     const newPassword = document.getElementById("newPassword").value.trim();
     const confirmNewPassword = document.getElementById("confirmNewPassword").value.trim();
@@ -361,7 +431,7 @@ function updatePassword() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
             current_password: currentPassword, 
-            new_password: newPassword 
+            password: newPassword  // ✅ FIXED
         })
     })
     .then(response => response.json())
@@ -371,7 +441,7 @@ function updatePassword() {
             document.getElementById("currentPassword").value = "";
             document.getElementById("newPassword").value = "";
             document.getElementById("confirmNewPassword").value = "";
-            window.location.href = '/profilepage'; // Reload profile page
+            window.location.href = '/profilepage';
         }
     })
     .catch(error => console.error("Error updating password:", error));
@@ -389,10 +459,10 @@ function showTherapyAppointments() {
             }
 
             let tableContent = `
-                <div class="therapy-container">
+                    <div class="table-container">
                     <h2 class="title">Booked Therapy Appointments</h2>
-                    <table class="therapy-table">
-                        <thead>
+                    <table class="appointment-table"> 
+                           <thead>
                             <tr>
                                 <th>Username</th>
                                 <th>Therapist Name</th>

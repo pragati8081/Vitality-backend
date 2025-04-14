@@ -239,14 +239,15 @@
       </div>
     </div>
   </div>
-<script>
+
+ <script>
   function selectOption(optionNumber) {
     console.log(`Option ${optionNumber} selected`);
-    alert(`You selected Option ${optionNumber}`);
+
     let response = {
         question_id: "Q1",
         selected_option: optionNumber,
-        quiz_category: "Physical Health",
+        quiz_category: "physical_health", // Change to lowercase or the correct expected format
         level: "LifeStyle"
     };
 
@@ -263,12 +264,13 @@
   }
 
   function goBack() {
-            window.location.href = '/lifestyle'; // Navigate to the Goals page
-    }
+    window.location.href = '/lifestyle'; // Navigate to the Goals page
+  }
 
   function goNext() {
     window.location.href = '/lifestyleQ2';
   }
+
   function goToHome() {
     window.location.href = '/physicalhome';
   }

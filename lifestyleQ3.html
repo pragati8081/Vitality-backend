@@ -242,40 +242,53 @@
 
   <script>
     function selectOption(optionNumber) {
-      console.log(`Option ${optionNumber} selected`);
-      alert(`You selected Option ${optionNumber}`);
+        console.log(`Option ${optionNumber} selected`);
+
+        // Construct the response object
         let response = {
-            question_id: "Q3",
+            question_id: "Q3",  // Ensure this corresponds to the current question
             selected_option: optionNumber,
-            quiz_category: "Physical Health",
+            quiz_category: "physical_health",  // Ensure it matches the backend expectations
             level: "LifeStyle"
         };
 
         console.log("Option Selected:", response);  // ✅ Debugging log
 
-        fetch("http://127.0.0.1:5000/store_quiz_response", {  // ✅ Ensure correct URL
+        // Send the response data to the backend without navigating away
+        fetch("http://127.0.0.1:5000/store_quiz_response", {  // Ensure correct URL
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response)
         })
         .then(response => {
             console.log("Fetch Response Status:", response.status);  // ✅ Log response status
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             return response.json();
         })
-        .then(data => console.log("Response saved:", data))
-        .catch(error => console.error("Fetch Error:", error));
+        .then(data => {
+            console.log("Response saved:", data);
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+            alert("Error saving your response. Please try again.");
+        });
     }
 
     function goBack() {
-            window.location.href = '/lifestyleQ2'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ2';  // Navigate to the previous question (ensure this is correct)
     }
 
     function goNext() {
-            window.location.href = '/lifestyleQ4'; // Navigate to the Goals page
+        window.location.href = '/lifestyleQ4';  // Navigate to the next question (ensure this is correct)
     }
+
     function goToHome() {
-      window.location.href = '/physicalhome'; // Change to actual homepage URL
+        window.location.href = '/physicalhome';  // Navigate to the homepage
     }
-  </script>
+</script>
+
+
 </body>
 </html>
