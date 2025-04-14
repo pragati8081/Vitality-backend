@@ -1,0 +1,38 @@
+[
+  {
+    "_id": { "$oid": "67e15722e680215350e17137" },
+    "name": "Dr. Ananya Sharma",
+    "phone": "+91-9876543210",
+    "email": "ananya.sharma@example.com",
+    "languages_spoken": ["English", "Hindi"],
+    "fees": {
+      "currency": "INR",
+      "amount": 1500
+    },
+    "slots": ["09:00 AM", "12:00 PM", "03:00 PM", "06:00 PM", "09:00 PM"]
+  },
+  {
+    "_id": { "$oid": "67e15722e680215350e17138" },
+    "name": "Dr. Priya Menon",
+    "phone": "+91-9876543333",
+    "email": "priya.menon@example.com",
+    "languages_spoken": ["English", "Hindi"],
+    "fees": {
+      "currency": "INR",
+      "amount": 1800
+    },
+    "slots": ["10:00 AM", "01:00 PM", "04:00 PM", "07:00 PM", "10:00 PM"]
+  },
+  {
+    "_id": { "$oid": "67e15722e680215350e17139" },
+    "name": "Dr. Rajesh Gupta",
+    "phone": "+91-9876543222",
+    "email": "rajesh.gupta@example.com",
+    "languages_spoken": ["English", "Hindi"],
+    "fees": {
+      "currency": "INR",
+      "amount": 2000
+    },
+    "slots": ["11:00 AM", "02:00 PM", "05:00 PM", "08:00 PM", "11:00 PM"]
+  }
+]

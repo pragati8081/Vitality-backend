@@ -1,0 +1,223 @@
+[
+    {
+      "name": "Supradyn Daily Multivitamin",
+      "category": "General & Daily",
+      "benefits": ["Increases energy", "Supports mental alertness", "Enhances immunity"],
+      "ingredients": ["Vitamin C", "Zinc", "Vitamin B12"],
+      "price": 299,
+      "brand": "Supradyn",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "B12", "Zinc"]
+    },
+    {
+      "name": "Zincovit Tablet",
+      "category": "Immunity",
+      "benefits": ["Strengthens immunity", "Improves skin health", "Promotes hair growth"],
+      "ingredients": ["Zinc", "Vitamin C", "Selenium"],
+      "price": 199,
+      "brand": "Zincovit",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Zinc", "Vitamin C"]
+    },
+    {
+      "name": "HealthKart HK Vitals Multivitamin",
+      "category": "Affordable & Indian",
+      "benefits": ["Supports heart health", "Boosts metabolism", "Improves immunity"],
+      "ingredients": ["Vitamin D", "B Complex", "Magnesium"],
+      "price": 399,
+      "brand": "HealthKart",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin D", "B Complex", "Magnesium"]
+    },
+    {
+      "name": "MuscleBlaze MB-Vite Multivitamin",
+      "category": "Affordable & Indian",
+      "benefits": ["Improves gut health", "Enhances energy", "Boosts immunity"],
+      "ingredients": ["Digestive Enzymes", "Vitamin C", "Vitamin B12"],
+      "price": 450,
+      "brand": "MuscleBlaze",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "B12"]
+    },
+    {
+      "name": "MuscleTech Platinum Multivitamin",
+      "category": "Premium & International",
+      "benefits": ["Enhances recovery", "Supports overall health", "Boosts energy"],
+      "ingredients": ["Amino Acids", "Vitamin C", "B Complex"],
+      "price": 999,
+      "brand": "MuscleTech",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "B Complex"]
+    },
+    {
+      "name": "Wellbeing Nutrition Melts Multivitamins",
+      "category": "Premium & Advanced",
+      "benefits": ["Enhances wellness", "Boosts immunity", "Improves energy"],
+      "ingredients": ["Vitamin C", "Vitamin B12", "Zinc"],
+      "price": 599,
+      "brand": "Wellbeing Nutrition",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "B12", "Zinc"]
+    },
+    {
+      "name": "Maxirich Gold",
+      "category": "Bone, Skin & Hair Health",
+      "benefits": ["Improves brain function", "Boosts cardiovascular health", "Supports metabolism"],
+      "ingredients": ["Omega-3", "Vitamin B", "Iron"],
+      "price": 699,
+      "brand": "Maxirich",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Omega-3", "Vitamin B", "Iron"]
+    },
+    {
+      "name": "Becozym C Forte",
+      "category": "Bone, Skin & Hair Health",
+      "benefits": ["Improves nerve health", "Boosts metabolism", "Enhances skin health"],
+      "ingredients": ["B-complex", "Vitamin C", "Zinc"],
+      "price": 239,
+      "brand": "Becozym",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["B-complex", "Vitamin C", "Zinc"]
+    },
+    {
+      "name": "Nature Made Multivitamin Tablets",
+      "category": "General & Daily",
+      "benefits": ["Supports immune system", "Improves energy", "Fills dietary gaps"],
+      "ingredients": ["Vitamin D", "Magnesium", "Iron"],
+      "price": 649,
+      "brand": "Nature Made",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin D", "Magnesium", "Iron"]
+    },
+    {
+      "name": "Nutrilite Daily Multivitamin",
+      "category": "General & Daily",
+      "benefits": ["Improves immunity", "Promotes vitality", "Fills nutrition gaps"],
+      "ingredients": ["Vitamin C", "Iron", "Folic Acid"],
+      "price": 849,
+      "brand": "Nutrilite",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "Iron", "Folic Acid"]
+    },
+    {
+      "name": "Garden of Life Vitamin Code Raw One",
+      "category": "Premium & Organic",
+      "benefits": ["Supports digestion", "Improves heart health", "Boosts energy"],
+      "ingredients": ["Enzymes", "Magnesium", "Vitamin B12"],
+      "price": 1299,
+      "brand": "Garden of Life",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Magnesium", "B12"]
+    },
+    {
+      "name": "Himalayan Organics Whole Food Multivitamin",
+      "category": "Organic & Indian",
+      "benefits": ["Improves energy", "Supports immunity", "Enhances wellness"],
+      "ingredients": ["Spinach Extract", "Zinc", "Vitamin D"],
+      "price": 599,
+      "brand": "Himalayan Organics",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Zinc", "Vitamin D"]
+    },
+    {
+      "name": "Fast&Up Vitalize Multivitamin",
+      "category": "Effervescent & Sports",
+      "benefits": ["Enhances hydration", "Boosts stamina", "Improves nutrient absorption"],
+      "ingredients": ["Magnesium", "Vitamin C", "Zinc"],
+      "price": 549,
+      "brand": "Fast&Up",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Magnesium", "Vitamin C", "Zinc"]
+    },
+    {
+      "name": "Boldfit Multivitamin for Men & Women",
+      "category": "Fitness & Wellness",
+      "benefits": ["Improves digestion", "Boosts immunity", "Reduces stress"],
+      "ingredients": ["Ashwagandha", "Magnesium", "Vitamin B6"],
+      "price": 499,
+      "brand": "Boldfit",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Magnesium", "Vitamin B6"]
+    },
+    {
+      "name": "Carbamide Forte Multivitamin",
+      "category": "General & Daily",
+      "benefits": ["Enhances vitality", "Improves brain function", "Supports eye health"],
+      "ingredients": ["Zinc", "Vitamin D", "Lutein"],
+      "price": 379,
+      "brand": "Carbamide Forte",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Zinc", "Vitamin D"]
+    },
+    {
+      "name": "TrueBasics Multivitamin",
+      "category": "Fitness & Wellness",
+      "benefits": ["Boosts metabolism", "Improves joint health", "Enhances energy"],
+      "ingredients": ["Vitamin D", "Calcium", "Magnesium"],
+      "price": 699,
+      "brand": "TrueBasics",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin D", "Magnesium", "Calcium"]
+    },
+    {
+      "name": "WOW Life Science Multivitamin",
+      "category": "Natural & Herbal",
+      "benefits": ["Improves brain and heart health", "Boosts stamina", "Enhances immunity"],
+      "ingredients": ["Vitamin A to K", "Zinc", "Iron"],
+      "price": 499,
+      "brand": "WOW",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Iron", "Zinc"]
+    },
+    {
+      "name": "INLIFE Multivitamin and Minerals",
+      "category": "General Wellness",
+      "benefits": ["Improves overall health", "Strengthens bones", "Boosts energy"],
+      "ingredients": ["Vitamin D", "Calcium", "Iron"],
+      "price": 429,
+      "brand": "INLIFE",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin D", "Calcium", "Iron"]
+    },
+    {
+      "name": "Organic India Multivitamin",
+      "category": "Ayurvedic",
+      "benefits": ["Promotes detox", "Improves vitality", "Balances hormones"],
+      "ingredients": ["Tulsi", "Ashwagandha", "Amla"],
+      "price": 799,
+      "brand": "Organic India",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin C", "Natural Adaptogens"]
+    },
+    {
+      "name": "Dr. Morepen Daily Multivitamin",
+      "category": "Affordable & Daily",
+      "benefits": ["Improves metabolism", "Boosts stamina", "Supports digestion"],
+      "ingredients": ["Vitamin D", "B12", "Magnesium"],
+      "price": 349,
+      "brand": "Dr. Morepen",
+      "age_group": "18-50",
+      "gender_specific": "Unisex",
+      "deficiency_treated": ["Vitamin D", "B12", "Magnesium"]
+    }
+  ]
+  

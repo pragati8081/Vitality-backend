@@ -1,0 +1,121 @@
+  {
+  "Basic": {
+    "Q1": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": ["Vitamin D", "Vitamin B12", "Magnesium", "Calcium", "Zinc"],
+      "5": ["Vitamin D", "Vitamin B12", "Iron", "Magnesium", "Calcium", "Vitamin A", "Zinc", "Vitamin C"]
+    },
+    "Q2": {
+      "1": ["Vitamin D", "Magnesium", "Zinc", "Calcium", "Vitamin A"],
+      "2": ["Iron", "Vitamin B12", "Magnesium", "Calcium", "Vitamin A", "Zinc", "Vitamin C"],
+      "3": ["Magnesium", "Zinc", "Vitamin D"]
+    },
+    "Q3": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": []
+    },
+    "Q4": {
+      "1": ["Iron", "Vitamin B12", "Magnesium", "Vitamin D", "Calcium"],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": ["Vitamin D", "Magnesium", "Calcium", "Zinc"]
+    },
+    "Q5": {
+      "1": [],
+      "2": ["Magnesium", "Vitamin D", "Calcium", "Vitamin B12"]
+    },
+    "Q6": {
+      "1": [],
+      "2": ["Magnesium", "Vitamin B12", "Vitamin D", "Zinc"],
+      "3": ["Vitamin D", "Magnesium", "Iron", "Calcium", "Zinc"],
+      "4": ["Magnesium", "Vitamin B12", "Vitamin D", "Zinc", "Vitamin C"],
+      "5": []
+    },
+    "Q7": {
+      "1": [],
+      "2": ["Magnesium", "Vitamin B12", "Vitamin D", "Zinc", "Vitamin A"]
+    },
+    "Q8": {
+      "1": ["Vitamin D", "Magnesium", "Zinc", "Vitamin C"],
+      "2": [],
+      "3": [],
+      "4": []
+    },
+    "Q9": {
+      "1": ["Vitamin B12", "Iron", "Magnesium", "Calcium", "Zinc", "Vitamin A"],
+      "2": ["Vitamin B12", "Iron", "Magnesium", "Calcium", "Zinc", "Vitamin A"],
+      "3": [],
+      "4": ["Vitamin D", "Magnesium", "Calcium"],
+      "5": []
+    },
+    "Q10": {
+      "1": ["Iron", "Vitamin B12", "Magnesium", "Vitamin C", "Zinc"],
+      "2": [],
+      "3": []
+    }
+  },
+  "Lifestyle": {
+    "Q1": {
+      "1": ["Magnesium", "Vitamin B12", "Vitamin D", "Vitamin C", "Calcium"],
+      "2": [],
+      "3": [],
+      "4": []
+    },
+    "Q2": {
+      "1": ["Vitamin D", "Magnesium", "Iron", "Vitamin A", "Vitamin C"],
+      "2": [],
+      "3": [],
+      "4": []
+    },
+    "Q3": {
+      "1": ["Magnesium", "Vitamin C", "Calcium"],
+      "2": ["Magnesium", "Vitamin B12", "Vitamin C", "Zinc"],
+      "3": ["Vitamin D", "Calcium", "Zinc"],
+      "4": ["Vitamin D", "Magnesium", "Calcium", "Vitamin A"]
+    },
+    "Q4": {
+      "1": ["Magnesium", "Vitamin A", "Iron"],
+      "2": ["Magnesium", "Vitamin B12", "Zinc", "Vitamin C"],
+      "3": ["Magnesium", "Vitamin B12", "Vitamin A", "Zinc", "Vitamin C"],
+      "4": ["Magnesium", "Vitamin B12", "Vitamin D", "Vitamin C", "Zinc"]
+    },
+    "Q5": {
+      "1": [],
+      "2": [],
+      "3": ["Magnesium", "Vitamin B12", "Vitamin D"],
+      "4": ["Magnesium", "Vitamin B12", "Vitamin D", "Vitamin C"]
+    },
+    "Q6": {
+      "1": ["Magnesium", "Vitamin C", "Zinc"],
+      "2": [],
+      "3": [],
+      "4": []
+    },
+    "Q7": {
+      "1": [],
+      "2": [],
+      "3": ["Magnesium", "Vitamin A"],
+      "4": ["Magnesium", "Zinc", "Vitamin D"]
+    },
+    "Q8": {
+      "1": [],
+      "2": [],
+      "3": ["Magnesium", "Vitamin B12", "Vitamin C", "Zinc"]
+    },
+    "Q9": {
+      "1": ["Magnesium", "Vitamin B12", "Vitamin D", "Zinc", "Vitamin A"],
+      "2": []
+    },
+    "Q10": {
+      "1": ["Magnesium", "Vitamin B12", "Vitamin C", "Iron", "Vitamin A"],
+      "2": [],
+      "3": [],
+      "4": ["Magnesium", "Vitamin D", "Zinc", "Vitamin C"]
+    }
+  }
+}
